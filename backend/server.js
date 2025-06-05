@@ -2,7 +2,8 @@ import express from "express"
 import cors from "cors"
 import dotenv from "dotenv"
 import connectDb from "./db/connectDb.js"
-
+import adminRoutes from "./routes/admin.js"
+import userRoutes from "./routes/user.js"
 
 const app = express()
 //allow access to environment variables
@@ -16,6 +17,9 @@ await connectDb().catch((err)=>{console.log(err.message)})
 app.get("/", (req,res)=>{
     res.send("Hello World")
 })
+
+app.use('/admin',adminRoutes)
+app.use('/user',userRoutes)
 
 app.listen(process.env.PORT, ()=>{
     console.log(`Server running on localhost:${process.env.PORT}`)
