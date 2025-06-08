@@ -12,11 +12,9 @@ dotenv.config()
 //allow json parsing for incoming requests
 app.use(express.json())
 
-await connectDb().catch((err)=>{console.log(err.message)})
+app.use(cors())
 
-app.get("/", (req,res)=>{
-    res.send("Hello World")
-})
+await connectDb().catch((err)=>{console.log(err.message)})
 
 app.use('/admin',adminRoutes)
 app.use('/user',userRoutes)

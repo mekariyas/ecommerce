@@ -1,8 +1,8 @@
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
-import multer from "multer";
 import User from "../models/user.js"
-import Product from "../models/user.js"
+import Product from "../models/Product.js"
+
 
 //log in and log out(get request)
 //add a new product (post request)
@@ -34,19 +34,20 @@ const login  = async (req,res)=>{
 }
 
 const addProduct = async(req, res)=>{
-    const { name, price, brand, description, stock, color, image} = req.body()
-
-    if( !name || !price || !brand || !description || !stock ||!color || !image ){
+    const { name, price, brand, description, size,stock, color} = req.body
+    const image = req.file?.filename
+    if( !name || !price || !brand || !description || size.length == 0 ||!stock ||!color || !image ){
         return res.status(400).json({message: "Incomplete data", success: false})
     }
     try{
         const itemStored = await Product.findOne({name: name})
         if(itemStored){
-            return res.status(403).json({message:"Item already exists", success:false})
+            return res.status(409).json({message:"Item already exists", success:false})
         }
-        await Product.insertOne({name:name, price:price, brand:brand, description: description, stock:stock, color: color, image: '../uploads/shoe-items/' + image})
+        await Product.create({name:name, price:price, brand:brand, description: description, stock:stock, size: size, color: color, image: '../uploads/shoe-items/' + image})
         return res.status(201).json({message:"Item created", success: true})
     }catch(error){
+        console.log(error.message)
         return res.status(500).json({message:"Internal server Error"})    
     }
 }
@@ -68,16 +69,17 @@ const getProduct  = async(req, res)=>{
 }
 
 const restockProduct = async(req, res)=>{
-    const {name, price, brand, description, stock, color, image} = req.params
+    const {name, price, brand, description, stock, color} = req.body
+    const image = req.file?.filename
     if(!name){
         return res.status(401).json({message:"Product name not provided", success: false})
     }
     try{
-        await Product.findOneAndUpdate({name: name}, {name:name, price:price, brand:brand, description:description, stock:stock, color:color, image:image})
+        await Product.findOneAndUpdate({name: name}, {name:name, price:price, brand:brand, description:description, stock:stock, color:color, image: '../uploads/shoe-items/' + image})
         return res.status(200).json({message:"Product Updated", success:true})
     }
     catch(error){
-        return res.status(500).json({message:"Internal server error"})        
+        return res.status(500).json({message:"Internal server error"})
     }
 }
 
@@ -101,7 +103,6 @@ const deleteProduct   = async(req, res)=>{
 
 
 const logout = async(req, res)=>{}
-
 
 
 export {login, addProduct,getProduct, restockProduct, deleteProduct, logout}
