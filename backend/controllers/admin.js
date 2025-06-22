@@ -14,19 +14,31 @@ const login  = async (req,res)=>{
     const { email, password } = req.body
     
     if (!email || !password){
-        return res.status(401).json({message:"Missing credentials", success:false})
+        return res.status(400).json({message:"Missing email or password", success:false})
     }
     
     try{
-        const getUser  = await User.find({email:email})
+        const getUser  = await User.findOne({email:email})
         if(!getUser){
             return res.status(401).json({message: "Unauthorized access", success: false})
+        }
+        if(getUser.role !=="admin"){
+            return res.status(403).json({message: "Access denied: Admins only", success: false})
         }
         const verifyUser  = await bcrypt.compare(password, getUser.password)
         if(!verifyUser){
             return res.status(401).json({message: "Incorrect password", success: false})
         }
-        return res.status(200).json({message:"successfully authorized", success: true})
+        const accessToken = jwt.sign({email:getUser.email, role: getUser.role},process.env.SECRET_TOKEN,{expiresIn: "15m"})
+        const refreshToken = jwt.sign({email:getUser.email, role: getUser.role}, process.env.SECRET_TOKEN,{expiresIn: "168h"})
+
+        res.cookie("jwt_cookie", refreshToken, {
+            maxAge : 7 * 24 * 60 * 60 * 1000,
+            httpOnly: true,
+            sameSite: "lax",
+            secure: process.env.NODE_ENV === "production"
+        })
+        return res.status(200).json({message:"successfully authorized", success: true, accessToken})
     
     }catch(error){
         return res.status(500).json({message:"Internal Server Error", success: false})
@@ -36,7 +48,7 @@ const login  = async (req,res)=>{
 const addProduct = async(req, res)=>{
     const { name, price, brand, description, size,stock, color} = req.body
     const image = req.file?.filename
-    if( !name || !price || !brand || !description || size.length == 0 ||!stock ||!color || !image ){
+    if( !name || !price || !brand || !description || !size || size.length == 0 ||!stock ||!color || !image ){
         return res.status(400).json({message: "Incomplete data", success: false})
     }
     try{
@@ -102,7 +114,20 @@ const deleteProduct   = async(req, res)=>{
 }
 
 
-const logout = async(req, res)=>{}
+const logout = async(req, res)=>{
+    const cookie = req.cookies?.jwt_cookie
+
+    if (!cookie){
+        return res.status(404).json({message: "cookie not found", success: false})
+    }
+
+    res.clearCookie("jwt_cookie",{
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production"})
+    
+    return res.status(200).json({message: "successfully logged out", success: true})
+}
 
 
 export {login, addProduct,getProduct, restockProduct, deleteProduct, logout}
