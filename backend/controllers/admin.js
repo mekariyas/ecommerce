@@ -10,6 +10,9 @@ import Product from "../models/Product.js"
 //delete a product(delete request)
 
 
+
+//admin
+
 const login  = async (req,res)=>{
     const { email, password } = req.body
     
@@ -20,7 +23,7 @@ const login  = async (req,res)=>{
     try{
         const getUser  = await User.findOne({email:email})
         if(!getUser){
-            return res.status(401).json({message: "Unauthorized access", success: false})
+            return res.status(404).json({message: "User Does not Exist", success: false})
         }
         if(getUser.role !=="admin"){
             return res.status(403).json({message: "Access denied: Admins only", success: false})
@@ -38,80 +41,14 @@ const login  = async (req,res)=>{
             sameSite: "lax",
             secure: process.env.NODE_ENV === "production"
         })
-        return res.status(200).json({message:"successfully authorized", success: true, accessToken})
+        return res.status(200).json({message:"successfully authorized", success: true, accessToken, id:getUser.id})
     
     }catch(error){
-        return res.status(500).json({message:"Internal Server Error", success: false})
-    }
-}
-
-const addProduct = async(req, res)=>{
-    const { name, price, brand, description, size,stock, color} = req.body
-    const image = req.file?.filename
-    if( !name || !price || !brand || !description || !size || size.length == 0 ||!stock ||!color || !image ){
-        return res.status(400).json({message: "Incomplete data", success: false})
-    }
-    try{
-        const itemStored = await Product.findOne({name: name})
-        if(itemStored){
-            return res.status(409).json({message:"Item already exists", success:false})
-        }
-        await Product.create({name:name, price:price, brand:brand, description: description, stock:stock, size: size, color: color, image: '../uploads/shoe-items/' + image})
-        return res.status(201).json({message:"Item created", success: true})
-    }catch(error){
         console.log(error.message)
-        return res.status(500).json({message:"Internal server Error"})    
-    }
-}
-
-const getProduct  = async(req, res)=>{
-    const { name } = req.body;
-    if(!name){
-        return res.status(400).json({message: "No query defined", success:false})
-    }
-    try{
-        const item = await Product.findOne({name:name});
-    if(!item){
-        return res.status(404).json({message: "Item not found", success:false})
-    }
-    return res.status(200).json({item})
-    }catch(error){
         return res.status(500).json({message:"Internal Server Error", success: false})
     }
 }
 
-const restockProduct = async(req, res)=>{
-    const {name, price, brand, description, stock, color} = req.body
-    const image = req.file?.filename
-    if(!name){
-        return res.status(401).json({message:"Product name not provided", success: false})
-    }
-    try{
-        await Product.findOneAndUpdate({name: name}, {name:name, price:price, brand:brand, description:description, stock:stock, color:color, image: '../uploads/shoe-items/' + image})
-        return res.status(200).json({message:"Product Updated", success:true})
-    }
-    catch(error){
-        return res.status(500).json({message:"Internal server error"})
-    }
-}
-
-const deleteProduct   = async(req, res)=>{
-    const {name} = req.params
-    if(!name){
-        return res.status(401).json({message:"Product name not provided", success: false})
-    }
-    try{
-        const findItem = await Product.deleteOne({name: name})
-        if(!findItem){
-            return res.status(404).json({message:"Product does not exist", success: false})
-        } 
-        
-        return res.status(204).json({message:"Product deleted", success: true})
-    }
-    catch(error){
-        return res.status(500).json({message:"Internal server error"})        
-    }
-}
 
 
 const logout = async(req, res)=>{
@@ -130,4 +67,109 @@ const logout = async(req, res)=>{
 }
 
 
-export {login, addProduct,getProduct, restockProduct, deleteProduct, logout}
+const getAdmin = async(req, res) => {
+    try{
+        const { id } = req.params
+        const admin = await User.findById(id)
+        if(!admin){
+            return res.status(404).json({message: "Admin not found"})
+        }
+        return res.status(200).json({firstName: admin.fName ,lastName: admin.lName})
+    }
+    catch(error){
+        
+        console.log(error.message)
+        return res.status(500).json({message:"Internal Server Error", success: false})
+    }
+}
+
+
+//Product CRUD
+
+const addProduct = async(req, res)=>{
+    const { name, price, brand, description, size ,stock, color} = req.body
+    const image = req.file?.filename
+    if( !name || !price || !brand || !description || !size  ||!stock ||!color || !image ){
+        return res.status(400).json({message: "Incomplete data", success: false})
+    }
+    try{
+        const itemStored = await Product.findOne({name: name})
+        if(itemStored){
+            return res.status(409).json({message:"Item already exists", success:false})
+        }
+        await Product.create({name:name, price:Number(price), brand:brand, description: description, stock: Number(stock), size: size.split(","), color: color.split(","), image:image})
+        return res.status(201).json({message:"Item created", success: true})
+    }catch(error){
+        console.log(error.message)
+        return res.status(500).json({message:"Internal server Error"})    
+    }
+}
+
+const getProducts = async(req, res)=>{
+    try{
+        const products = await  Product.find({}).limit(5)
+
+        return res.status(200).json({products:products})
+    }catch(error){
+        return res.status(500).json({message: "Internal server error", success: false})
+    }
+}
+
+const getProduct  = async(req, res)=>{
+    const { name } = req.params;
+    if(!name){
+        return res.status(400).json({message: "No query defined", success:false})
+    }
+    try{
+        const item = await Product.findOne({name:name});
+    if(!item){
+        return res.status(404).json({message: "Item not found", success:false})
+    }
+    return res.status(200).json({item})
+    }catch(error){
+        
+        console.log(error.message)
+        return res.status(500).json({message:"Internal Server Error", success: false})
+    }
+}
+
+const restockProduct = async(req, res)=>{
+    const {name, price, brand, description, stock, color} = req.body
+    const image = req.file?.filename
+    if(!name){
+        return res.status(401).json({message:"Product name not provided", success: false})
+    }
+    try{
+        await Product.findOneAndUpdate({name: name}, {name:name, price:price, brand:brand, description:description, stock:stock, color:color, image: '../uploads/shoe-items/' + image})
+        return res.status(200).json({message:"Product Updated", success:true})
+    }
+    catch(error){
+        
+        console.log(error.message)
+        return res.status(500).json({message:"Internal server error"})
+    }
+}
+
+const deleteProduct   = async(req, res)=>{
+    const {name} = req.body
+    if(!name){
+        return res.status(401).json({message:"Product name not provided", success: false})
+    }
+    try{
+        const findItem = await Product.findOne({name: name})
+        if(!findItem){
+            return res.status(404).json({message:"Product does not exist", success: false})
+        } 
+        await Product.findOneAndDelete({name:name})
+        return res.status(204).json({message:"Product deleted", success: true})
+    }
+    catch(error){
+        
+        console.log(error.message)
+        return res.status(500).json({message:"Internal server error"})        
+    }
+}
+
+
+
+export {login, getAdmin, logout, addProduct, getProduct, restockProduct, deleteProduct, getProducts}

@@ -9,8 +9,9 @@ import Login from "./admin/pages/Login"
 import Dashboard from "./admin/pages/Dashboard"
 import AdminHome from "./admin/pages/Home"
 import AddProduct from "./admin/pages/AddProduct"
-
-
+import AdminProducts from "./admin/pages/Products"
+import Orders from "./admin/pages/Orders"
+import EditProduct from "./admin/pages/EditProduct"
 
 //User pages
 import SignIn from "./user/SignIn"
@@ -64,6 +65,18 @@ const App = () => {
         {
           path:"/dashboard/:id/addProduct",
           element:<AddProduct/>
+        },
+        {
+          path:"/dashboard/:id/products",
+          element:<AdminProducts/>
+        },
+        {
+          path:"/dashboard/:id/orders",
+          element:<Orders/>
+        },
+        {
+          path:"/dashboard/:id/:name",
+          element:<EditProduct/>
         }
       ]
     }
