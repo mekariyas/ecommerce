@@ -28,9 +28,7 @@ const Products = () => {
   const handleDataFetch = async()=>{
     try{
         const dataFetched = await instance.get("/admin/getProducts")
-        //console.log(dataFetched.data.products)
         const { products } = dataFetched.data
-        console.log(products)
         setProducts(products)
     }catch(error){
       console.log(error)
@@ -44,15 +42,21 @@ const Products = () => {
     handleDataFetch()
   },[])
 
-  //const handleDelete = ()=>{}
+  const handleDelete = async(product:string)=>{
+    try{    
+      const deleteData = await instance.delete("/admin/deleteProduct",{name: product})
+    }catch(error){
+      console.log(error)
+    }
+  }
   
   return (
     <section className="w-full h-[80vh] md:h-full relative top-16 md:static overflow-y-scroll">
-      <ul className="w-full flex flex-wrap items-between justify-center md:justify-start space-x-4 mb-2 md:pl-2 pt-4">
+      <ul className="w-full flex flex-col items-center md:flex-row md:flex-wrap md:items-between justify-center md:justify-start md:space-x-4 mb-2 md:pl-2 pt-4">
         {products.map(product=>{
           return(
           <li key={product._id} className="w-[80%] md:w-[45%] border-[0.5px] h-[88vh] flex flex-col  items-start md:space-x-2 rounded-lg mb-2">
-            <img src={`https://res.cloudinary.com/${cloudName}/image/upload/c_scale,w_500/q_auto/f_auto/${product.image}`} alt={product.name} className="w-[100%] h-[55%] object-contain md:object-cover rounded-tl-md rounded-tr-md" loading="lazy"/>
+            <img src={`https://res.cloudinary.com/${cloudName}/image/upload/c_scale,w_500/q_auto/f_auto/${product.image}`} alt={product.name} className="w-[100%] h-[55%]  md:object-cover rounded-tl-md rounded-tr-md" loading="lazy"/>
             <section className="ml-2">
               <h1 className="md:text-lg font-semibold w-full">Name: {product.name}</h1>
               <h2 className="md:text-lg font-semibold w-full">Brand: {product.brand}</h2>
@@ -78,7 +82,7 @@ const Products = () => {
             </section>
             <section className="w-full flex justify-center items-center gap-2 h-20">
                 <button className="bg-orange-500 w-[20%] h-[40%] rounded-lg text-center flex items-center justify-center text-white cursor-pointer" onClick={()=>handleEditPageRoute(product.name)}><FaRegEdit className="ml-2 w-[30%] h-[75%]"/></button>
-                <button className="bg-red-600 w-[20%] h-[40%] rounded-lg text-center flex items-center justify-center text-white cursor-pointer"><CiTrash className="w-[25%] h-[90%]"/></button>
+                <button className="bg-red-600 w-[20%] h-[40%] rounded-lg text-center flex items-center justify-center text-white cursor-pointer" onClick={()=>handleDelete(product.name)}><CiTrash className="w-[25%] h-[90%]"/></button>
               </section>
           </li>)
       })}

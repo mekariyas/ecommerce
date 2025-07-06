@@ -135,7 +135,7 @@ const getProduct  = async(req, res)=>{
 
 const restockProduct = async(req, res)=>{
     const {name, price, brand, description, stock, color} = req.body
-    const image = req.file?.filename
+    const image = req.file?.filename || req.body.image
     if(!name){
         return res.status(401).json({message:"Product name not provided", success: false})
     }
