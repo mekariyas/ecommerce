@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 import User from "../models/user.js"
-import Product from "../models/Product.js"
+import Product from "../models/product.js"
 
 
 //log in and log out(get request)
@@ -135,7 +135,7 @@ const getProduct  = async(req, res)=>{
 
 const restockProduct = async(req, res)=>{
     const {name, price, brand, description, stock, color} = req.body
-    const image = req.file?.filename || req.body.image
+    const image = req.file?.filename ?? req.body.image
     if(!name){
         return res.status(401).json({message:"Product name not provided", success: false})
     }
