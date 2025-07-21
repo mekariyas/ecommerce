@@ -53,7 +53,7 @@ const signIn = async (req,res)=>{
             sameSite: "lax",
             secure: process.env.NODE_ENV === "production"
         })
-        return res.status(200).json({message:"successfully authorized", success: true, accessToken, id:getUser.id})
+        return res.status(200).json({message:"successfully authorized", success: true, accessToken, id:findUser.id})
     }catch(error){
         console.log(error)
         return res.status(500).json({message:"Internal server error", success: false})
@@ -69,6 +69,25 @@ const getProducts = async(req, res)=>{
         return res.status(500).json({message: "Internal server error", success: false})
     }
 }
+
+const getProduct  = async(req, res)=>{
+    const { name } = req.params;
+    if(!name){
+        return res.status(400).json({message: "No query defined", success:false})
+    }
+    try{
+        const item = await Product.findOne({name:name});
+    if(!item){
+        return res.status(404).json({message: "Item not found", success:false})
+    }
+    return res.status(200).json({item})
+    }catch(error){
+        
+        console.log(error.message)
+        return res.status(500).json({message:"Internal Server Error", success: false})
+    }
+}
+
 
 const logOut = async(req, res)=>{
     const cookie = req.cookies?.jwt_cookie
@@ -86,4 +105,4 @@ const logOut = async(req, res)=>{
 }
 
 
-export { signUp, signIn, getProducts, logOut}
+export { signUp, signIn, getProduct,getProducts, logOut}
