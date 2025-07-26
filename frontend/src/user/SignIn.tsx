@@ -1,4 +1,3 @@
-import React from 'react'
 import LoginSvg from "../assets/admin/dashboardLogin.svg"
 
 import LoginForm from './components/Login-form'

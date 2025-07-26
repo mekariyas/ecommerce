@@ -12,7 +12,7 @@ const Navbar = () => {
   }
   return (
     <header
-        className='w-full h-20 z-[10] bg-white sticky top-0 flex items-center justify-between'>
+        className='w-full h-20 z-[10] bg-white sticky top-0  flex items-center justify-between'>
         <section className="ml-2 w-28 h-20 flex items-center justify-center">
             <img src={kickova} alt="Kickova-logo" className="w-full h-16"/>
         </section>
