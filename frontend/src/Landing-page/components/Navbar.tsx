@@ -16,7 +16,7 @@ const Navbar = () => {
         <section className="ml-2 w-28 h-20 flex items-center justify-center">
             <img src={kickova} alt="Kickova-logo" className="w-full h-16"/>
         </section>
-        <nav className={`${isVisible? "hidden":""} flex flex-col md:flex  md:flex-row justify-evenly items-center absolute md:static top-20 w-full h-[30vh] md:h-full bg-white   md:w-[70%] md:ml-40 text-lg md:text-2xl bg-none`}>
+        <nav className={`${!isVisible? "hidden" : ""} flex flex-col md:flex  md:flex-row justify-evenly items-center absolute md:static top-20 w-full h-[30vh] md:h-full bg-white   md:w-[70%] md:ml-40 text-lg md:text-2xl bg-none`}>
             <Link to="/" className="w-full text-center">Home</Link>
             <Link to="/products" className="w-full text-center">Products</Link>
             <Link to="/cart" className="w-full flex justify-center"><BiCart className="w-12 h-12"/></Link>

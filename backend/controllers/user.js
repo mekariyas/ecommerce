@@ -3,7 +3,7 @@ import Product from "../models/product.js"
 import jwt from "jsonwebtoken"
 import bcrypt from "bcryptjs"
 
-const signUp = async(req, res)=>{
+const signUp = async (req, res) => {
     const {firstName, lastName, email, password } = req.body;
     if(!firstName || !lastName || !email || !password ){
         res.status(400).json({message:"Missing email or password", success:false})
@@ -33,7 +33,7 @@ const signUp = async(req, res)=>{
     }
 }
 
-const signIn = async (req,res)=>{
+const signIn = async (req,res) => {
     const { email, password } = req.body;
     try{
         const findUser = await User.findOne({email: email})
@@ -60,17 +60,17 @@ const signIn = async (req,res)=>{
     }
 }
 
-const getProducts = async(req, res)=>{
+const getProducts = async (req, res) => {
     try{
-        const products = await  Product.find({}).limit(5)
-
-        return res.status(200).json({products:products})
+        const totalProducts = await Product.countDocuments({});
+        const products = await  Product.find({}).limit(5);
+        return res.status(200).json({products:products, totalProducts: totalProducts})
     }catch(error){
         return res.status(500).json({message: "Internal server error", success: false})
     }
 }
 
-const getProduct  = async(req, res)=>{
+const getProduct  = async  (req, res) => {
     const { name } = req.params;
     if(!name){
         return res.status(400).json({message: "No query defined", success:false})
@@ -89,7 +89,7 @@ const getProduct  = async(req, res)=>{
 }
 
 
-const logOut = async(req, res)=>{
+const logOut = async (req, res) => {
     const cookie = req.cookies?.jwt_cookie
 
     if (!cookie){

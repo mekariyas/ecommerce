@@ -1,7 +1,6 @@
 import express from "express";
 import {signUp, signIn, logOut, getProducts, getProduct} from "../controllers/user.js"
 
-
 const userRoutes = express.Router()
 
 userRoutes.post("/signUp", signUp)

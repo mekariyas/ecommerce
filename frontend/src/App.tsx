@@ -18,6 +18,7 @@ import SignIn from "./user/SignIn"
 import SignUp from "./user/SignUp"
 import Cart from "./user/Cart"
 import Products from "./user/Products"
+import OrderForm from "./user/OrderForm"
 
 const App = () => {
 
@@ -32,7 +33,11 @@ const App = () => {
         },
         {
           path:"/products",
-          element: <Products/>
+          element: <Products/>,
+        },
+        {
+          path:"/addProduct/:name",
+          element: <OrderForm/>
         },
         {
           path: "/cart",
