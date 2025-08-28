@@ -27,12 +27,12 @@ const useOrderStore = create<State & Actions>()(
     orders: [],
     addToCart: (item) => {
         set((state) => {
-          const existingItem = state.orders.find((order) => order._id === item._id);
+          const existingItem = state.orders.find((order) => order.brand === item.brand);
           if (existingItem) {
             return {
               orders: state.orders.map((order) =>
-                order._id === item._id
-                  ? { ...order, amount: order.amount + item.amount }
+                order.brand === item.brand
+                  ? { ...order,price: order.price + item.price, amount: order.amount + item.amount, size: order.size === item.size? order.size : order.size + ","+ item.size, color: order.color === item.color? order.color: order.color + "," + item.color}
                   : order
               ),
             };

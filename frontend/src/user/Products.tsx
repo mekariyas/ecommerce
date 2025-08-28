@@ -53,7 +53,8 @@ const Products = () => {
 
   return (
     <>
-    <section className="w-full">
+    { products.length > 0? 
+    (<><section className="w-full">
       <ul className="w-full flex flex-col items-center md:flex-row md:flex-wrap md:items-between justify-center md:justify-start md:space-x-4 mb-2 md:pl-2 pt-4">
         {products.map(product=>{
           return(
@@ -90,7 +91,7 @@ const Products = () => {
         )}
       </ul>
     </section>
-    <Pagination totalProducts={totalProducts}/>
+    <Pagination totalProducts={totalProducts}/></>) : (<p className="text:lg mt-10 text-center w-full font-bold">Loading...</p>)}
     </>
 )}
 

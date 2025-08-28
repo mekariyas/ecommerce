@@ -28,7 +28,7 @@ const OrderForm = () => {
   const [amount, setAmount] = useState<number>(1)
 
   const [size, setSize] = useState<string>("")
-  const [color, setColor] = useState<string>(productData.color[0])
+  const [color, setColor] = useState<string>("")
   const addToCart = useOrderStore((state)=>state.addToCart)  
   const handleProductFetch = async()=>{
     try{
@@ -56,7 +56,9 @@ const OrderForm = () => {
 
   const handleOrderSubmission = (e: FormEvent,_id:string, name:string, brand:string, amount:number,price:number, size: string,color:string, image:string )=>{
     e.preventDefault()
-    addToCart({_id,name,brand,amount,price, size,color,image})
+    addToCart({_id,name,brand,amount,price, size,color: color? color : productData.color[0],image})
+    alert("Added to Cart");
+    navigate(-1);
   }
   return (
     <section className="w-full flex md:flex-row flex-col justify-around items-start">
@@ -79,8 +81,8 @@ const OrderForm = () => {
         <input type="number" name="name" value={productData.price}  readOnly disabled className="w-[93%] md:w-[85%] h-12 border-2 border-gray-200 pl-2 rounded-md cursor-not-allowed"/>
         <label  className="w-full h-10">Size: {productData.size.join(",")}</label>
         <input type="text" value={size} onChange={(e)=>setSize(e.target.value)} required className="w-[93%] md:w-[85%] h-12 border-[1px] pl-2 rounded-md"/>
-        <input type="submit" className="border-2 w-[93%] md:w-[85.5%]  h-12  rounded-md cursor-pointer bg-slate-600  text-white font-bold mb-1"/>
-        <button type="button" className="border-2 w-[93%] md:w-[85.5%]  h-12 rounded-md cursor-pointer bg-red-600  text-white font-bold mb-1" onClick={()=>navigate(-1)}>Cancel</button>
+        <input type="submit" className="w-[93%] md:w-[85.5%]  h-12  rounded-md cursor-pointer bg-slate-600  text-white font-bold mb-1"/>
+        <button type="button" className="w-[93%] md:w-[85.5%]  h-12 rounded-md cursor-pointer bg-red-600  text-white font-bold mb-1" onClick={()=>navigate(-1)}>Cancel</button>
       </form></>):(<p className="text:lg mt-10 text-center w-full font-bold">Loading...</p>)
       }
     </section>
