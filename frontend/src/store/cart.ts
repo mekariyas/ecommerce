@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+//Item information
 type info = {
     _id:string,
     name: string,
@@ -12,6 +13,7 @@ type info = {
     image: string
 }  
 
+//state & actions 
 type State = {
     orders: info[]
 }

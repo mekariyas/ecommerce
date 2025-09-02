@@ -2,6 +2,8 @@ import {useEffect, useState} from 'react'
 import {useOrderStore} from "../store/cart.ts"
 import { FaTrash } from 'react-icons/fa6' 
 
+import DeliveryForm from "./components/Delivery-form.tsx"
+
 interface product{
   amount: number,
   brand: string,
@@ -22,6 +24,7 @@ const Cart = () => {
   const clearCart = useOrderStore((state)=> state.clearCart)
   const [items, setItems] = useState<product[]>([...Orders])
 
+  const [isAddressFormVisible, setIsAddressFormVisible] = useState<boolean>(false)
   const handleClearCart= ()=>{
     clearCart()
     setItems([...Orders])
@@ -31,9 +34,10 @@ const Cart = () => {
     setItems([...Orders])
   },[Orders])
   return (
-    <section className="w-full flex flex-col items-center">
+    <section className="w-full mt-1 flex flex-col items-center">
       {items.length === 0? (<p className="text:lg mt-10 text-center w-full font-bold">Cart is empty</p>):(
         <>
+        {isAddressFormVisible && (<DeliveryForm setIsAddressFormVisible={setIsAddressFormVisible}/>)}
         <ul className="w-[100%] mt-3 md:w-[70%] flex flex-col">
          {items.map(item=>{
           return<li key={item._id} className="flex flex-col items-center md:flex-row md:justify-between pt-4 pl-4 pr-4 h-[70vh]">
@@ -51,11 +55,11 @@ const Cart = () => {
           </li>
          })}
         </ul>
-        <p className="w-[70%] md:w-[68%] text-lg font-bold mt-2">Total: {items.reduce((prev,curr)=>{
+        <p className="w-[70%] md:w-[68%] text-lg font-bold mt-16 md:mt-2">Total: {items.reduce((prev,curr)=>{
           return prev + curr.price
         },0)} ETB</p>
-        <button className="mt-3 mb-3 w-[70%] md:w-[38%] h-14 bg-slate-600 rounded-md font-bold text-lg text-white cursor-pointer">Check Out</button>
-        <button onClick={handleClearCart} className="mb-2 w-[70%] md:w-[38%] h-14 bg-red-600 rounded-md font-bold text-lg text-white cursor-pointer" >Clear Cart</button>
+        <button className="mt-3 mb-3 w-[82%] md:w-[38%] h-14 bg-slate-600 rounded-md font-bold text-lg text-white cursor-pointer" onClick={()=>setIsAddressFormVisible(true)}>Check Out</button>
+        <button onClick={handleClearCart} className="mb-2 w-[82%] md:w-[38%] h-14 bg-red-600 rounded-md font-bold text-lg text-white cursor-pointer" >Clear Cart</button>
         </>)}
     </section>
   )

@@ -1,7 +1,10 @@
-import User from "../models/user.js"
-import Product from "../models/product.js"
 import jwt from "jsonwebtoken"
 import bcrypt from "bcryptjs"
+
+import User from "../models/user.js"
+import Product from "../models/product.js"
+import Order from "../models/order.js"
+
 
 const signUp = async (req, res) => {
     const {firstName, lastName, email, password } = req.body;
@@ -17,7 +20,7 @@ const signUp = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password,salt)
         await User.create({fName:firstName, lName:lastName, email:email, password:hashedPassword})
         const getUser  = await User.findOne({email:email})
-        const accessToken  = jwt.sign({email:getUser.email, role: getUser.role},process.env.SECRET_TOKEN,{expiresIn: "15m"})
+        const accessToken  = jwt.sign({_id: getUser._id,email:getUser.email, role: getUser.role},process.env.SECRET_TOKEN,{expiresIn: "15m"})
         const refreshToken = jwt.sign({email:getUser.email, role: getUser.role}, process.env.SECRET_TOKEN,{expiresIn: "168h"})
 
         res.cookie("jwt_cookie", refreshToken, {
@@ -62,8 +65,9 @@ const signIn = async (req,res) => {
 
 const getProducts = async (req, res) => {
     try{
+        const skip = parseInt(req.query.skip) || 0
         const totalProducts = await Product.countDocuments({});
-        const products = await  Product.find({}).limit(5);
+        const products = await  Product.find({}).skip(skip).limit(5);
         return res.status(200).json({products:products, totalProducts: totalProducts})
     }catch(error){
         return res.status(500).json({message: "Internal server error", success: false})
@@ -88,9 +92,14 @@ const getProduct  = async  (req, res) => {
     }
 }
 
+const placeOrder = async(req, res)=>{
+    const {order, address} = req.body
+    console.log(order)
+    console.log(address)
+}
 
 const logOut = async (req, res) => {
-    const cookie = req.cookies?.jwt_cookie
+    const cookie = req.cookies.jwt_cookie
 
     if (!cookie){
         return res.status(404).json({message: "cookie not found", success: false})
@@ -104,5 +113,4 @@ const logOut = async (req, res) => {
     return res.status(200).json({message: "successfully logged out", success: true})
 }
 
-
-export { signUp, signIn, getProduct,getProducts, logOut}
+export { signUp, signIn, getProduct, placeOrder, getProducts, logOut}

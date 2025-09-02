@@ -1,12 +1,11 @@
 import { useState,useEffect, FormEvent }from 'react'
 import { useNavigate, useParams} from "react-router-dom";
 
-import { v4 as uuidv4} from "uuid"
-
 import instance from "../api/api.tsx"
 import { useOrderStore } from '../store/cart.ts';
 
 interface product{
+  _id: string,
   name:string,
   brand: string,
   stock: number,
@@ -23,7 +22,7 @@ const OrderForm = () => {
   const navigate  = useNavigate();
   const cloudName = import.meta.env.VITE_CLOUD_NAME;
 
-  const [productData, setProductData] = useState<product>({name:"", brand:"", stock:0, size:[],price:0, color:[], image:""})
+  const [productData, setProductData] = useState<product>({_id:"",name:"", brand:"", stock:0, size:[],price:0, color:[], image:""})
 
   const [amount, setAmount] = useState<number>(1)
 
@@ -35,6 +34,7 @@ const OrderForm = () => {
       const product = await instance(`/user/product/${name}`);
       const item = product.data.item
       setProductData({
+        _id:item._id,
         name: item.name,
         brand: item.brand,
         stock: item.stock,
@@ -64,7 +64,7 @@ const OrderForm = () => {
     <section className="w-full flex md:flex-row flex-col justify-around items-start">
       { productData.brand ?(<><img src={`https://res.cloudinary.com/${cloudName}/image/upload/c_scale,w_500/q_auto/f_auto/${productData.image}`} alt={productData.name} className="mt-18 ml-10 md:ml-0 mb-10 md:mb-0 rounded-md"/>
       
-      <form className="w-[100%] md:w-[40%] flex flex-col text-base md:text-lg pl-4 gap-4" onSubmit={(e)=>handleOrderSubmission(e,uuidv4(),productData.name,productData.brand,amount, productData.price * amount,size,color,productData.image)}>
+      <form className="w-[100%] md:w-[40%] flex flex-col text-base md:text-lg pl-4 gap-4" onSubmit={(e)=>handleOrderSubmission(e,productData._id,productData.name,productData.brand,amount, productData.price * amount,size,color,productData.image)}>
         <label className="w-full h-10">Name:</label>
         <input type="text" name="name" value={name} readOnly disabled className="w-[93%] md:w-[85%] h-12 border-2 border-gray-200 pl-2 rounded-md cursor-not-allowed"/>
         <label className="w-full h-10">Brand:</label>

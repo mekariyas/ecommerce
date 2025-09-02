@@ -3,7 +3,7 @@ import { BiHide,BiShow } from "react-icons/bi"
 import { AxiosError } from "axios"
 import { useNavigate } from "react-router-dom"
 import instance from "../../api/api.tsx"
-
+import { useTokenStorage } from "../../store/token.ts"
 
 const SignupForm = () => {
     const [show, setShow ] = useState<boolean>(false)
@@ -24,11 +24,16 @@ const SignupForm = () => {
     const [errorMessage, setErrorMessage] = useState<string>("")
     const [isError, setIsError]  = useState<boolean>(false)
 
+    
+    const saveToken = useTokenStorage((state)=>state.saveToken)
+
     const handleSignUp = async(e:FormEvent)=>{
       e.preventDefault()
       setIsLogging(true)
       try{
         const signUpRequest  = await instance.post("user/signUp", {firstName, lastName, email, password})
+        const { accessToken } = signUpRequest.data
+        saveToken(accessToken)
         navigate("/products")
       }catch(error){
         if (error instanceof AxiosError){
@@ -39,15 +44,13 @@ const SignupForm = () => {
          setIsError(true)
       }
     } 
-
     useEffect(()=>{
       if(isError){
         const timer = setTimeout(()=>{setIsError(false)},5000)
 
         return ()=> clearTimeout(timer)
       }
-    },[isError])
-    
+    },[isError])  
   return (
     <form className="ml-2 w-full md:w-[95%] h-[85%] flex flex-col items-center gap-3" onSubmit={handleSignUp}>
             <label className="w-full text-xl font-bold">FirstName:</label>
@@ -62,7 +65,7 @@ const SignupForm = () => {
                 <button type="button" className='border-blue-950 border-r-[1px] border-t-[1px] border-b-[1px]  w-[10%] text-blue-950  h-10 flex justify-center items-center rounded-r-2xl cursor-pointer' onClick={handleVisibility}>{show? <BiHide className="w-[70%] h-[70%] bg-none font-medium"/> : <BiShow className="w-[70%] h-[70%] bg-none"/>}</button>
             </section>
             {isError?(<p className="text-xl font-semibold text-red-600 w-[85%] text-wrap h-12">{errorMessage}</p>):(<></>)}
-            <input type="submit" value={isLogging? "Logging In...":"Login"} title="Login" disabled={isLogging} className={`${isLogging? "bg-slate-600 text-white cursor-not-allowed": ""} bg-blue-950 text-white w-[85%] h-10 rounded-2xl text-xl font-bold cursor-pointer`}/>
+            <input type="submit" value={isLogging? "Signing up...":"SignUp"} title="Login" disabled={isLogging} className={`${isLogging? "bg-slate-600 text-white cursor-not-allowed": ""} bg-blue-950 text-white w-[85%] h-10 rounded-2xl text-xl font-bold cursor-pointer`}/>
         </form>
   )
 }

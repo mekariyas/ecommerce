@@ -1,5 +1,5 @@
 import express from "express";
-import {signUp, signIn, logOut, getProducts, getProduct} from "../controllers/user.js"
+import {signUp, signIn, logOut, placeOrder,getProducts, getProduct} from "../controllers/user.js"
 
 const userRoutes = express.Router()
 
@@ -12,5 +12,6 @@ userRoutes.get("/products", getProducts)
 userRoutes.get("/product/:name", getProduct)
 
 userRoutes.get("/logOut", logOut)
+userRoutes.post("/placeOrder", placeOrder)
 
 export default userRoutes

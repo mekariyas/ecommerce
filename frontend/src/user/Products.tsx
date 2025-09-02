@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useSearchParams } from "react-router-dom"
+import { useTokenStorage } from '../store/token.ts'
 
 import instance from "../api/api.tsx"
 
@@ -23,18 +24,25 @@ const Products = () => {
 
   const navigate = useNavigate() 
 
+  const [searchParams, setSearchParams ] = useSearchParams()
+
   const [products, setProducts] = useState<products[]>([])
   const [totalProducts, setTotalProducts] = useState<number>(0)
   
+  const saveToken = useTokenStorage((state)=>state.saveToken)
+
   const handleDataFetch = async()=>{
       try{
-        const dataFetched = await instance.get("/user/products")
-        const { products, totalProducts } = dataFetched.data
+        const dataFetched = await instance.get(`/user/products/?page=${searchParams.get("page")}&skip=${searchParams.get("skip") ?? 0}`)
+        const { products, totalProducts,accessToken } = dataFetched.data
+        if(accessToken){
+          saveToken(accessToken)
+        }
         setProducts(products)
-        if(totalProducts % 4 === 0){
-          setTotalProducts(totalProducts / 4)
+        if(totalProducts % 5 === 0){
+          setTotalProducts(totalProducts / 5)
         } else{
-          setTotalProducts(Math.ceil(totalProducts / 4))
+          setTotalProducts(Math.ceil(totalProducts / 5))
         }
       }catch(error){
         console.log(error)
@@ -49,7 +57,7 @@ const Products = () => {
 
   useEffect(()=>{
     handleDataFetch()
-  },[])
+  },[searchParams])
 
   return (
     <>
@@ -60,7 +68,7 @@ const Products = () => {
           return(
             <li key={product._id} className="w-[80%] md:w-[45%] border-[0.5px] h-[89vh] flex flex-col  items-start md:space-x-2 rounded-lg mb-2">
               <img src={`https://res.cloudinary.com/${cloudName}/image/upload/c_scale,w_500/q_auto/f_auto/${product.image}`} alt={product.name} className="w-[100%] h-[55%] md:object-cover rounded-tl-md rounded-tr-md" loading="lazy"/>
-              <section className="ml-2">
+              <section className="ml-2 mt-6 md:mt-0">
                 <h1 className="md:text-lg font-semibold w-full">Name: {product.name}</h1>
                 <h2 className="md:text-lg font-semibold w-full">Brand: {product.brand}</h2>
                 <p className="md:text-lg font-semibold w-full">Description: {product.description}</p>
@@ -83,7 +91,7 @@ const Products = () => {
                   })}
                 </ul>): product.color}</section>
               </section>
-              <section className="w-full flex justify-center items-center mt-1">
+              <section className="w-full flex justify-center items-center mt-2 md:mt-1">
                 <button className="border-2 w-38 h-10 font-semibold text-white bg-blue-600 rounded-md cursor-pointer" onClick={()=>handleOrderFormNavigation(product.name)}>Add To Cart</button>
               </section>
             </li>

@@ -1,6 +1,39 @@
+import { useState, useEffect } from "react"
+import { useNavigate, useSearchParams } from "react-router-dom"
+
 const Pagination = ({...props}: {totalProducts: number}) => { 
+  const navigate = useNavigate()
+  
+  const [searchParams, setSearchParams ] = useSearchParams()
+
+  const [buttons, setButtons] = useState<number[]>([])
+
+  const handleButtonsPopulation = (num: number)=>{
+    if (num == 0 ){
+      return 
+    }
+    setButtons(prev=>[num, ...prev])
+    return handleButtonsPopulation(num-1)
+  } 
+
+  useEffect(()=>{
+    console.log(searchParams.get("page"))
+    handleButtonsPopulation(props.totalProducts)
+  },[])
+
   return (
-    <ul className={`border-2 w-[80%] h-28 rounded-md flex ${props.totalProducts > 10? "justify-start":"justify-center"} flex-wrap justify-center pl-2 pt-2 mb-2`}>{props.totalProducts}</ul>
+    <>
+      <hr className="w-full h-4 text-slate-400"/>
+        <ul className={`w-[80%] rounded-md mt-2 flex ${buttons.length > 10? "justify-start pt-2 pb-2":"justify-center items-center"} gap-10 flex-wrap justify-center pl-2 pt-2 mb-2`}>
+            {buttons.map((button,i)=>{
+              return (
+                <li key={i} className="w-16 h-16">
+                  <button className={`w-full text-lg h-full  ${button === parseInt(searchParams.get("page"))? "bg-slate-600": "bg-blue-600"} cursor-pointer text-white font-medium rounded-md`} 
+                  onClick={()=> navigate(`/products/?page=${button}&skip=${button == 1? 0: i * (props.totalProducts + 1)}`)}>{button}</button>
+                </li>)
+         })}
+        </ul>
+    </>
 )}
 
 export default Pagination
