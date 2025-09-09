@@ -1,8 +1,11 @@
 import { useState,useEffect, FormEvent }from 'react'
+import { AxiosError } from "axios"
 import { useNavigate, useParams} from "react-router-dom";
 
-import instance from "../api/api.tsx"
+import instance from "../api/api.tsx";
 import { useOrderStore } from '../store/cart.ts';
+
+import { useTokenStorage } from "../store/token.ts";
 
 interface product{
   _id: string,
@@ -18,6 +21,8 @@ interface product{
 
 const OrderForm = () => {
 
+  const token = useTokenStorage((state)=>state.token)
+
   const {name} = useParams();
   const navigate  = useNavigate();
   const cloudName = import.meta.env.VITE_CLOUD_NAME;
@@ -31,7 +36,12 @@ const OrderForm = () => {
   const addToCart = useOrderStore((state)=>state.addToCart)  
   const handleProductFetch = async()=>{
     try{
-      const product = await instance(`/user/product/${name}`);
+      const product = await instance.get(`/user/product/${name}`,{
+        headers:{
+          Authorization: `bearer ${token}`
+        },
+        withCredentials: true
+      });
       const item = product.data.item
       setProductData({
         _id:item._id,
@@ -44,7 +54,20 @@ const OrderForm = () => {
         image: item.image
       });      
     }catch(error){
-      console.log(error)
+      if (error instanceof AxiosError){
+        if (error.status === 401 || error.status === 404){
+          alert("Please login or signUp")
+          navigate(-1)
+        }
+        else if(error.status === 500){
+          alert("Internal Server Error")
+          navigate(-1)
+        }
+      }
+      else if(error instanceof Error){
+        alert("Error occurred Please try again")
+        navigate(-1)
+      }
     }
   }
 
@@ -70,7 +93,7 @@ const OrderForm = () => {
         <label className="w-full h-10">Brand:</label>
         <input type="text" name="Brand" value={productData.brand} readOnly disabled className="w-[93%] md:w-[85%] h-12 border-2 border-gray-200 pl-2 rounded-md cursor-not-allowed"/>
         <label className="w-full h-10">Amount:</label>
-        <input type="number" name="Amount" min="1" max={productData.stock} value={amount} onChange={(e)=>setAmount(parseInt(e.target.value))} className="w-[93%] md:w-[85%] h-12 border-[1px] pl-2 rounded-md"/>
+        <input type="number" name="Amount" min="1" max={`${productData.stock}`} value={amount} onChange={(e)=>setAmount(parseInt(e.target.value))} className="w-[93%] md:w-[85%] h-12 border-[1px] pl-2 rounded-md"/>
         <label className="w-full h-10">Color:</label>
         <select value={color} onChange={(e)=>setColor(e.target.value)} className="w-[93%] md:w-[85%] h-12 border-[1px] pl-2 rounded-md">
           {productData.color.map((prodColor,i)=>{

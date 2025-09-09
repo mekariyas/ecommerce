@@ -1,6 +1,7 @@
 import { useState, useEffect, FormEvent} from "react"
 import { AxiosError } from "axios"
 import { useNavigate } from 'react-router-dom'
+import { useTokenStorage } from "../../store/token.ts"
 
 import instance from "../../api/api.tsx"
 import { BiHide,BiShow } from "react-icons/bi"
@@ -20,14 +21,15 @@ const LoginForm = () => {
   const [isSuccess, setIsSuccess ] = useState<boolean>(true)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const navigate = useNavigate() 
+  const saveToken = useTokenStorage((state)=>state.saveToken) 
 
   const handleSubmit = async( e:FormEvent )=>{
     setIsLoading(true)
     e.preventDefault()
     try{
-      const sendData = await instance.post("/user/signIn",{email, password})
-      console.log(sendData)
-      navigate(`/products`)
+      const sendData = await instance.post("/user/signIn",{email, password} ,{withCredentials: true})
+      saveToken(sendData.data.accessToken)
+      navigate(`/products/?page=1`)
       setIsLoading(false)
     }
     catch(error){

@@ -1,6 +1,7 @@
 import express from "express"
 import cors from "cors"
 import dotenv from "dotenv"
+import cookieParser from "cookie-parser"
 import connectDb from "./db/connectDb.js"
 import adminRoutes from "./routes/admin.js"
 import userRoutes from "./routes/user.js"
@@ -8,13 +9,22 @@ import userRoutes from "./routes/user.js"
 //allow access to environment variables
 dotenv.config()
 
+
 const app = express()
+
 
 
 //allow json parsing for incoming requests
 app.use(express.json())
+app.use(cookieParser())
 
-app.use(cors())
+
+app.use(cors({
+    origin:"http://localhost:5173",
+    methods: ["GET","POST","PUT","DELETE"],
+    credentials: true
+}))
+
 
 await connectDb().catch((err)=>{console.log(err.message)})
 

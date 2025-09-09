@@ -27,16 +27,20 @@ const Navbar = () => {
   const handleLogout = async()=>{
     setIsLoggingOut(true)
     try{
-      const logOut = await instance.get("/user/logOut")
+      const logOut = await instance.get("/user/logOut", {withCredentials: true})
       console.log(logOut)
       if (logOut.status === 200){
         clearToken()
       }
     }catch(error){
       if (error instanceof Error || error instanceof AxiosError){
+        console.log(error)
         alert(error.message)
       }
-      alert("Internal server error please Try again")
+      else{
+        alert("Internal server error please Try again")
+      }
+      clearToken()
     }finally{
       setIsLoggingOut(false)
     }

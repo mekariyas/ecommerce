@@ -1,5 +1,6 @@
 import { useState, FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom';
+import { AxiosError } from "axios";
 import { MdOutlineCancel } from "react-icons/md";
 import instance from "../../api/api"
 
@@ -17,19 +18,33 @@ const DeliveryForm = ({...props}: {setIsAddressFormVisible:(val:boolean)=>void})
     const [formData, setFormData] = useState<deliveryInfo>({city:"",subCity:"", streetName:"",houseNumber: "", phoneNumber:""})
     const Orders = useOrderStore((state)=>state.orders)
     const clearCart = useOrderStore((state)=>state.clearCart)
+    const navigate = useNavigate() 
     const handleFormVisibility=()=>{
         props.setIsAddressFormVisible(false)
     }
 const handleSubmission = async( e: FormEvent )=>{
     e.preventDefault()
     try{
-        const order  = await instance.post(`/user/placeOrder`,{order:Orders, address:formData})
+        const order  = await instance.post(`/user/placeOrder`,{order:Orders, address:formData},{withCredentials:true})
             alert("Order has been placed")
             clearCart()
             props.setIsAddressFormVisible(false)
             
     }catch(error){
-        console.log(error)
+        if (error instanceof AxiosError){
+        if (error.status === 401 || error.status === 404 ||error.status === 404){
+          alert("Please login or signUp")
+          navigate(-1)
+        }
+        else if(error.status === 500){
+          alert("Internal Server Error")
+          navigate(-1)
+        }
+      }
+      else if(error instanceof Error){
+        alert("Error occurred Please try again")
+        navigate(-1)
+      }
     }
 }
   return (

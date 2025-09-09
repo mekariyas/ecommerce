@@ -31,7 +31,7 @@ const SignupForm = () => {
       e.preventDefault()
       setIsLogging(true)
       try{
-        const signUpRequest  = await instance.post("user/signUp", {firstName, lastName, email, password})
+        const signUpRequest  = await instance.post("user/signUp", {firstName, lastName, email, password}, {withCredentials: true})
         const { accessToken } = signUpRequest.data
         saveToken(accessToken)
         navigate("/products")

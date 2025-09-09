@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { AxiosError } from "axios"
 import { useNavigate, useSearchParams } from "react-router-dom"
 import { useTokenStorage } from '../store/token.ts'
 
@@ -33,8 +34,9 @@ const Products = () => {
 
   const handleDataFetch = async()=>{
       try{
-        const dataFetched = await instance.get(`/user/products/?page=${searchParams.get("page")}&skip=${searchParams.get("skip") ?? 0}`)
+        const dataFetched = await instance.get(`/user/products/?page=${searchParams.get("page")}&skip=${searchParams.get("skip") ?? 0}`,{withCredentials: true})
         const { products, totalProducts,accessToken } = dataFetched.data
+      
         if(accessToken){
           saveToken(accessToken)
         }
@@ -45,7 +47,19 @@ const Products = () => {
           setTotalProducts(Math.ceil(totalProducts / 5))
         }
       }catch(error){
-        console.log(error)
+        if (error instanceof AxiosError){
+          if(error.status === 500){
+            alert("Internal Server Error, please Try again")
+            navigate("/")
+          }
+        }
+        else if (error instanceof Error){
+          if(error.message === "Network Error"){
+            alert("NetWork Error, please try again")
+            navigate("/")
+          }
+        }
+        
     } 
   }
 

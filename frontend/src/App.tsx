@@ -20,6 +20,10 @@ import Cart from "./user/Cart"
 import Products from "./user/Products"
 import OrderForm from "./user/OrderForm"
 
+
+//ErrorPage
+import ErrorPage from "./ErrorPage"
+
 const App = () => {
 
   const router = createBrowserRouter([
@@ -84,6 +88,10 @@ const App = () => {
           element:<EditProduct/>
         }
       ]
+    },
+    {
+      path:"*",
+      element: <ErrorPage/>
     }
   ])
   return (
