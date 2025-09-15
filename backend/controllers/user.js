@@ -1,9 +1,29 @@
+import mongoose from "mongoose"
 import jwt from "jsonwebtoken"
 import bcrypt from "bcryptjs"
 import User from "../models/user.js"
 import Product from "../models/product.js"
 import Order from "../models/order.js"
 
+
+const refresh =(req, res)=>{
+    const refreshToken = req.cookies.userCookie;
+    if (!refreshToken){
+        return res.status(401).json({ message: "No token" })
+    };
+    
+  try {
+    const decoded = jwt.verify(refreshToken, process.env.SECRET_TOKEN);
+    const accessToken = jwt.sign(
+      { id: decoded.id },
+      process.env.SECRET_TOKEN,
+      { expiresIn: "15m" }
+    );
+    res.json({ accessToken });
+  } catch (err) {
+    res.status(403).json({ message: "Invalid refresh token" });
+  }
+}
 
 const signUp = async (req, res) => {
     const {firstName, lastName, email, password } = req.body;
@@ -118,8 +138,46 @@ const getProduct  = async  (req, res) => {
 
 const placeOrder = async(req, res)=>{
     const {order, address} = req.body
-    console.log(order)
-    console.log(address)
+    const userId = req.userId
+    const totalPrice = order.reduce((prev,curr)=>{
+        return prev + curr.price
+    },0)
+
+    try{
+        const findUser = await User.findById(userId)
+        if(!findUser){
+            return res.status(404).json({message:"User not found login or sign up", success:false})
+        }
+        const session = await mongoose.startSession()
+        session.startTransaction()
+        for(const item of order){
+            try{
+                const product = await Product.findById(item._id).session(session)
+                if(!product){
+                    throw new Error( "Product not found")
+                }
+                else if (product.stock < item.amount){
+                    throw new Error("Not enough stock")
+                }
+                product.stock -= item.amount
+
+                await product.save({session})
+               
+            }catch(error){
+                console.log(error.message)
+                return res.status(400).json({message:`${error.message}`, success:false})
+            }
+        }
+        const newOrder = new Order({user:userId, address, OrderList: order, totalPrice})
+        await newOrder.save()
+        await session.commitTransaction()
+        session.endSession()
+        return res.status(200).json({message:"Ordered Successfully", success:true})
+    }catch(error){
+        console.log(error.message)
+        return res.status(500).json({message:"Internal Server Error", success:false})
+    }
+    
 }
 
 const logOut = async (req, res) => {
@@ -136,4 +194,4 @@ const logOut = async (req, res) => {
     return res.status(200).json({message: "successfully logged out", success: true})
 }
 
-export { signUp, signIn, getProduct, placeOrder, getProducts, logOut}
+export { signUp, signIn, getProduct, placeOrder, getProducts, logOut, refresh}

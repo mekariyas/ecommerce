@@ -1,6 +1,9 @@
 import {useEffect, useState} from 'react'
+import { useTokenStorage } from '../store/token';
 import {useOrderStore} from "../store/cart.ts"
 import { FaTrash } from 'react-icons/fa6' 
+import {AxiosError} from "axios"
+import instance from "../api/api.tsx"
 
 import DeliveryForm from "./components/Delivery-form.tsx"
 
@@ -18,6 +21,22 @@ interface product{
 
 const Cart = () => {
 
+  const setToken = useTokenStorage(state=>state.saveToken)
+  const isAuth = async ()=>{
+      try{
+        const isLoggedIn = await instance.get("/user/refresh", {withCredentials:true})
+        setToken(isLoggedIn.data.accessToken)
+      }catch(error){
+        if(error instanceof Error || error instanceof AxiosError){
+          setToken("")
+        }
+      }
+    }
+
+    useEffect(()=>{
+      isAuth()
+    },[])
+  
   const cloudName = import.meta.env.VITE_CLOUD_NAME
   const Orders = useOrderStore((state)=>state.orders);
   const deleteItem = useOrderStore((state)=> state.deleteItem);
@@ -41,8 +60,8 @@ const Cart = () => {
         <ul className="w-[100%] mt-3 md:w-[70%] flex flex-col">
          {items.map(item=>{
           return<li key={item._id} className="flex flex-col items-center md:flex-row md:justify-between pt-4 pl-4 pr-4 h-[70vh]">
-            <section className="w-[80%] md:w-[50%] ">
-              <img src={`https://res.cloudinary.com/${cloudName}/image/upload/c_scale,w_500/q_auto/f_auto/${item.image}`} alt={item.name} className="w-[100%] h-[80%]  md:object-cover rounded-md" loading="lazy"/>
+            <section className="w-[80%]  md:w-[50%]">
+              <img src={`https://res.cloudinary.com/${cloudName}/image/upload/c_scale,w_500/q_auto/f_auto/${item.image}`} alt={item.name} className="w-[100%] h-[80%] md:h-[60vh]  md:object-contain rounded-md" loading="lazy"/>
             </section>
             <section className="w-[80%] md:w-[45%] h-[62.2%] flex flex-col pl-4 pt-2">
                 <p>Name: {item.name}</p>

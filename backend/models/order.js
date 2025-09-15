@@ -20,18 +20,24 @@ const orderSchema = new Schema({
             }
         },
     OrderList:[{
-        product: {
-            type: Schema.Types.ObjectId,
-            ref: "Product"
-        },
+        product:{type: Schema.Types.ObjectId,ref: "Product"},
+        name: {type:String, required: true},
+        brand: {type:String, required: true},
+        amount:{type: Number, required: true, min: 1},
+        price: {type: Number,required: true},
         color: [{type:String, required: true}],
         size: [{type:String, required: true}],
-        quantity:{ type: Number, required: true, min: 1},
-        total: {
-            type: Number,
-            required: true
-        }
-    }]
+        image: {type: String, required: true}
+    }],
+    totalPrice:{
+        type: Number,
+        required: true
+    },
+    status:{
+        type: String,
+        enum: ["Pending", "Delivered","Shipped","cancelled"],
+        default: "Pending"
+    }
 }, { timestamps: true})
 
 const Order = model("Order", orderSchema)

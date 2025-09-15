@@ -51,6 +51,9 @@ const Products = () => {
           if(error.status === 500){
             alert("Internal Server Error, please Try again")
             navigate("/")
+          }else if (error.status == 404){
+            alert("no items found")
+            navigate("/")
           }
         }
         else if (error instanceof Error){

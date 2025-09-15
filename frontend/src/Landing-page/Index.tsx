@@ -1,4 +1,4 @@
-import Hero from "../assets/landing/hero.jpg"
+import Hero from "../assets/landing/hero.webp"
 import BrandSlider from "./components/BrandSlider.tsx"
 import About from "./components/About.tsx"
 

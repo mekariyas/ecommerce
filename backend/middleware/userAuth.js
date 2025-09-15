@@ -20,10 +20,12 @@ const  userAuth =  (req, res, next)=>{
         })
     }else{
         verifyRefreshToken(refreshToken)
-        return next()
     }
-}
 
+    const decoded = jwt.decode(refreshToken, { complete:true })
+    req.userId = decoded.payload._id
+    return next()
+}
 
 function verifyRefreshToken(refreshToken){
     if(!refreshToken){
