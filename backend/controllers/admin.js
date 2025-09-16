@@ -108,9 +108,10 @@ const addProduct = async(req, res)=>{
 
 const getProducts = async(req, res)=>{
     try{
-        const products = await  Product.find({}).limit(5)
-
-        return res.status(200).json({products:products})
+        const skip = parseInt(req.query.skip) || 0
+        const totalProducts = await Product.countDocuments({});
+        const products = await  Product.find({stock:{$gt:0}}).skip(skip).limit(5);
+        return res.status(200).json({products:products, totalProducts})
     }catch(error){
         return res.status(500).json({message: "Internal server error", success: false})
     }

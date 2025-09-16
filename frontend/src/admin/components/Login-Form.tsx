@@ -5,8 +5,6 @@ import { useNavigate } from 'react-router-dom'
 import instance from "../../api/api.tsx"
 import { BiHide,BiShow } from "react-icons/bi"
 
-
-
 const LoginForm = () => {
   const [show, setShow ] = useState<boolean>(false)
 
@@ -39,7 +37,7 @@ const LoginForm = () => {
     else if(error instanceof Error){
       setErrorMessage("Internal Server Error, please try again")
       setIsSuccess(false)
-    }
+      }
     }
   }
 

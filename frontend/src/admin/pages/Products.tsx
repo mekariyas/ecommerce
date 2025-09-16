@@ -1,10 +1,12 @@
 import { useState,useEffect } from "react"
-import { useNavigate,useParams } from "react-router-dom"
+import { useNavigate,useParams, useSearchParams } from "react-router-dom"
 import { CiTrash } from "react-icons/ci";
 import { FaRegEdit } from "react-icons/fa";
 
-import instance from "../../api/api.tsx"
+import { AxiosError } from "axios"
 
+import instance from "../../api/api.tsx"
+import Pagination from "../../components/pagination.tsx"
 
 interface products{
   _id: string
@@ -19,17 +21,26 @@ interface products{
 }
 
 const Products = () => {
-  const{ id } = useParams()
+  const { id } = useParams()
   const navigate = useNavigate()
   const cloudName = import.meta.env.VITE_CLOUD_NAME
 
-  const [products, setProducts ] = useState<products[]>([])
+  const [searchParams, setSearchParams ] = useSearchParams()
 
+  const [products, setProducts ] = useState<products[]>([])
+  const [totalProducts, setTotalProducts] = useState<number>(0)
   const handleDataFetch = async()=>{
     try{
-        const dataFetched = await instance.get("/admin/getProducts")
-        const { products } = dataFetched.data
+        const dataFetched = await instance.get(`/admin/getProducts/?page=${searchParams.get("page")}&skip=${searchParams.get("skip") ?? 0}`,{withCredentials: true})
+        const { products , totalProducts } = dataFetched.data
+        
         setProducts(products)
+        if(totalProducts % 5 === 0){
+          setTotalProducts(totalProducts / 5)
+        } else{
+          setTotalProducts(Math.ceil(totalProducts / 5))
+        }
+
     }catch(error){
       console.log(error)
     }
@@ -40,19 +51,33 @@ const Products = () => {
   }
   useEffect(()=>{
     handleDataFetch()
-  },[])
+  },[searchParams])
 
   const handleDelete = async(product:string)=>{
     try{    
       const deleteData = await instance.delete("/admin/deleteProduct",{name: product})
     }catch(error){
-      console.log(error)
+      if (error instanceof AxiosError){
+          if(error.status === 500){
+            alert("Internal Server Error, please Try again")
+            navigate("/")
+          }else if (error.status == 404){
+            alert("no items found")
+            navigate("/")
+          }
+        }
+        else if (error instanceof Error){
+          if(error.message === "Network Error"){
+            alert("NetWork Error, please try again")
+            navigate("/")
+        }
+      }
     }
   }
   
   return (
     <section className="w-full h-[80vh] md:h-full relative top-16 md:static overflow-y-scroll">
-      <ul className="w-full flex flex-col items-center md:flex-row md:flex-wrap md:items-between justify-center md:justify-start md:space-x-4 mb-2 md:pl-2 pt-4">
+      {products.length > 0 ? (<><ul className="w-full flex flex-col items-center md:flex-row md:flex-wrap md:items-between justify-center md:justify-start md:space-x-4 mb-2 md:pl-2 pt-4">
         {products.map(product=>{
           return(
           <li key={product._id} className="w-[80%] md:w-[45%] border-[0.5px] h-[88vh] flex flex-col  items-start md:space-x-2 rounded-lg mb-2">
@@ -81,13 +106,15 @@ const Products = () => {
                 </ul>): product.color}</section>
             </section>
             <section className="w-full flex justify-center items-center gap-2 h-20">
-                <button className="bg-orange-500 w-[20%] h-[40%] rounded-lg text-center flex items-center justify-center text-white cursor-pointer" onClick={()=>handleEditPageRoute(product.name)}><FaRegEdit className="ml-2 w-[30%] h-[75%]"/></button>
-                <button className="bg-red-600 w-[20%] h-[40%] rounded-lg text-center flex items-center justify-center text-white cursor-pointer" onClick={()=>handleDelete(product.name)}><CiTrash className="w-[25%] h-[90%]"/></button>
+                <button className="bg-orange-500 w-[20%] h-[70%] rounded-lg text-center flex items-center justify-center text-white cursor-pointer" onClick={()=>handleEditPageRoute(product.name)}><FaRegEdit className="ml-2 w-[30%] h-[75%]"/></button>
+                <button className="bg-red-600 w-[20%] h-[70%] rounded-lg text-center flex items-center justify-center text-white cursor-pointer" onClick={()=>handleDelete(product.name)}><CiTrash className="w-[25%] h-[90%]"/></button>
               </section>
           </li>)
       })}
       </ul>
+      <Pagination totalProducts={totalProducts} id={id}/></>):(<p className="text:lg mt-10 text-center w-full font-bold">Loading...</p>)}
     </section>
+    
   )
 }
 

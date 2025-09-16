@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate, useSearchParams } from "react-router-dom"
 
-const Pagination = ({...props}: {totalProducts: number}) => { 
+const Pagination = ({...props}: {totalProducts: number, id? :string}) => { 
   const navigate = useNavigate()
   
   const [searchParams, setSearchParams ] = useSearchParams()
@@ -29,7 +29,7 @@ const Pagination = ({...props}: {totalProducts: number}) => {
               return (
                 <li key={i} className="w-16 h-16">
                   <button className={`w-full text-lg h-full  ${button === parseInt(searchParams.get("page"))? "bg-slate-600": "bg-blue-600"} cursor-pointer text-white font-medium rounded-md`} 
-                  onClick={()=> navigate(`/products/?page=${button}&skip=${button == 1? 0: i * (props.totalProducts + 1)}`)}>{button}</button>
+                  onClick={()=> navigate( props.id ? `/dashboard/${props.id}/products/?page=${button}&skip=${button == 1? 0: i * (props.totalProducts + 1)}` :`/products/?page=${button}&skip=${button == 1? 0: i * (props.totalProducts + 1)}`)}>{button}</button>
                 </li>)
          })}
         </ul>
