@@ -135,6 +135,7 @@ const getProduct  = async(req, res)=>{
     }
 }
 
+
 const restockProduct = async(req, res)=>{
     const {name, price, brand, description, stock, color} = req.body
     const image = req.file?.filename ?? req.body.image
@@ -172,7 +173,22 @@ const deleteProduct   = async(req, res)=>{
     }
 }
 
-//const getOrders
 
+const getOrders = async(req, res)=>{
+    try{
+        const skip = parseInt(req.query.skip) || 0
+        const totalOrders = await Order.countDocuments({});
+        const orders = await Order.find({status:"Pending"}).skip(skip).limit(5).sort({createdAt: -1})
+        let allOrders = []
+        for(const order of orders){
+            allOrders = [...allOrders, await order.populate('user', ['fName', 'lName', 'email'])]
+        }
+        return res.status(200).json({orders: allOrders, totalOrders})
+    }catch(error){
+        console.log(error.message)
+        return res.status(500).json({message: "Internal server error", success: false})
+    }
+}
 
-export {login, getAdmin, logout, addProduct, getProduct, restockProduct, deleteProduct, getProducts}
+const getOrder = ()=>{}
+export {login, getAdmin, logout, addProduct, getProduct, restockProduct, deleteProduct, getProducts, getOrders, getOrder}

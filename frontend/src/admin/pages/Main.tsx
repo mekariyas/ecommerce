@@ -12,9 +12,9 @@ const Main = () => {
   return (
     <>
       <Header handleVisibility={handleVisibility}/>
-      <main className="w-full h-[90vh] md:w-[100%] md:h-[90vh] flex">
+      <main className="w-full  md:w-[100%]  flex">
         <Navigation isVisible={isVisible} handleVisibility={handleVisibility}/>
-        <section className="w-full h-[100%] md:w-[85%]">
+        <section className="w-full md:w-[85%]">
           <Outlet/>
         </section>
       </main>

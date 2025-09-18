@@ -11,6 +11,7 @@ import AdminHome from "./admin/pages/Home"
 import AddProduct from "./admin/pages/AddProduct"
 import AdminProducts from "./admin/pages/Products"
 import Orders from "./admin/pages/Orders"
+import Order from "./admin/pages/Order"
 import EditProduct from "./admin/pages/EditProduct"
 
 //User pages
@@ -82,6 +83,10 @@ const App = () => {
         {
           path:"/dashboard/:id/orders",
           element:<Orders/>
+        },
+        {
+          path: "dashboard/:id/order/:orderId",
+          element: <Order/>
         },
         {
           path:"/dashboard/:id/:name",

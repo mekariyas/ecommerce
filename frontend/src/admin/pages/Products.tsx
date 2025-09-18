@@ -80,7 +80,7 @@ const Products = () => {
       {products.length > 0 ? (<><ul className="w-full flex flex-col items-center md:flex-row md:flex-wrap md:items-between justify-center md:justify-start md:space-x-4 mb-2 md:pl-2 pt-4">
         {products.map(product=>{
           return(
-          <li key={product._id} className="w-[80%] md:w-[45%] border-[0.5px] h-[88vh] flex flex-col  items-start md:space-x-2 rounded-lg mb-2">
+          <li key={product._id} className="w-[80%] md:w-[45%] shadow-2xl h-[88vh] flex flex-col  items-start md:space-x-2 rounded-lg mb-2">
             <img src={`https://res.cloudinary.com/${cloudName}/image/upload/c_scale,w_500/q_auto/f_auto/${product.image}`} alt={product.name} className="w-[100%] h-[55%]  md:object-cover rounded-tl-md rounded-tr-md" loading="lazy"/>
             <section className="ml-2">
               <h1 className="md:text-lg font-semibold w-full">Name: {product.name}</h1>

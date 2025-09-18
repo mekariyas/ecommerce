@@ -1,7 +1,7 @@
 import multer from "multer"
 import express from "express"
 import upload from "../middleware/cloudinaryStorage.js"
-import { login, getAdmin, logout, addProduct, getProduct, getProducts,restockProduct, deleteProduct} from "../controllers/admin.js"
+import { login, getAdmin, logout, addProduct, getProduct, getProducts,restockProduct, deleteProduct, getOrders, getOrder} from "../controllers/admin.js"
 import createAdmin from "../controllers/createAdmin.js"
 
 const uploadFile = upload.single('shoes')
@@ -39,4 +39,7 @@ adminRoutes.post('/newProduct',UploadMiddleware,addProduct)
 adminRoutes.put('/restock',UploadMiddleware,restockProduct)
 adminRoutes.delete('/deleteProduct', deleteProduct)
 
+
+adminRoutes.get("/orders", getOrders)
+adminRoutes.get("/order", getOrder)
 export default adminRoutes
