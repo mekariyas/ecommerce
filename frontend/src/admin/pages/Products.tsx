@@ -76,7 +76,7 @@ const Products = () => {
   }
   
   return (
-    <section className="w-full h-[80vh] md:h-full relative top-16 md:static overflow-y-scroll">
+    <section className="w-full h-[80vh] md:h-full relative top-16 md:static">
       {products.length > 0 ? (<><ul className="w-full flex flex-col items-center md:flex-row md:flex-wrap md:items-between justify-center md:justify-start md:space-x-4 mb-2 md:pl-2 pt-4">
         {products.map(product=>{
           return(

@@ -75,7 +75,7 @@ const Order = () => {
         handleOrderFetch()
     },[])
     return (
-        <section className="flex flex-col gap-3 mt-2">
+        <section className="flex flex-col gap-3 mt-16 md:mt-2">
             {isLoading? (<p className="w-full mt-10 text-center text-xl">Loading...</p>):
             (<>
                 <section className="border-b-[1px] md:ml-2 md:mr-2 w-full md:w-[95%] pl-2 md:border-[1px] border-slate-200 rounded-md shadow-md">

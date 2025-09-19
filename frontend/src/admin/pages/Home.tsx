@@ -30,7 +30,7 @@ const Home = () => {
     <section className="w-full h-[80vh] md:h-full relative top-16 md:static">
         <h1 className="w-full h-6 font-medium md:font-bold text-lg md:text-xl text-center mb-4">Admin Dashboard</h1>
         <section className="w-full flex flex-col items-start justify-center  pl-3 gap-2">
-            {!isError?(<p className="w-52 pl-2">Name: {fullName}</p>):(<p className="w-52 pl-2 text-red-600 text-xl font-bold">Error, reload page</p>)}
+            {!isError?(<p className="w-full md:text-xl text-center font-semibold">Welcome {fullName}</p>):(<p className="w-full md:text-xl text-center text-red-600  font-bold">Error, reload page</p>)}
         </section>
     </section>
   )

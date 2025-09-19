@@ -45,9 +45,9 @@ const Orders = () => {
   },[])
   return (
     <section className="w-full relative top-16 md:static">
-      <ul className="w-full h-[100vh] pl-4 pt-2 flex justify-start flex-wrap gap-2 overflow-y-scroll">
+      <ul className="w-full pl-4 pt-2 flex justify-start flex-wrap gap-6">
         {allOrders.map(order=>{
-          return<li key={order._id} className="w-[100%] md:w-[35%] h-[52vh] shadow-2xl rounded-md pt-2 pl-2">
+          return<li key={order._id} className="w-[100%] md:w-[35%] h-[52vh] shadow-lg shadow-black rounded-md pt-2 pl-2">
           <p className="text-base md:text-lg">Name: {order.fName} {order.lName}</p>
           <p className="text-base md:text-lg">Email: {order.email}</p>
           <p className="text-base md:text-lg">City: {order.address.city}</p>

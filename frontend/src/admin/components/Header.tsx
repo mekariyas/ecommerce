@@ -8,7 +8,7 @@ interface state{
 
 const Header = ({...props}: state) => {
   return (
-    <header className="w-full h-16 flex justify-between md:justify-start items-center gap-14 fixed top-0 z-[10] md:static">
+    <header className="w-full h-16 flex justify-between bg-white md:justify-start items-center gap-14 fixed  top-0 z-[10] ">
         <section className="h-full w-[35%] md:w-[20%] flex justify-start items-center pl-2">
             <img src={kickova} alt="logo" className="h-[80%] w-[85%] md:w-[70%]"/>
         </section>

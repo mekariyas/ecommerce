@@ -14,7 +14,7 @@ const Main = () => {
       <Header handleVisibility={handleVisibility}/>
       <main className="w-full  md:w-[100%]  flex">
         <Navigation isVisible={isVisible} handleVisibility={handleVisibility}/>
-        <section className="w-full md:w-[85%]">
+        <section className="w-full md:w-[85%]  md:mt-16">
           <Outlet/>
         </section>
       </main>
