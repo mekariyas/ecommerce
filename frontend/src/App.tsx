@@ -85,7 +85,7 @@ const App = () => {
           element:<Orders/>
         },
         {
-          path: "dashboard/:id/order/:orderId",
+          path: "/dashboard/:id/order/:orderId",
           element: <Order/>
         },
         {

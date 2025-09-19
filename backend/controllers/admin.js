@@ -190,5 +190,20 @@ const getOrders = async(req, res)=>{
     }
 }
 
-const getOrder = ()=>{}
+const getOrder = async(req , res)=>{
+    const { orderId } = req.params
+    if(!orderId){
+        return res.status(400).json({message: "No query defined", success:false})
+    }
+    try{
+        const order = await Order.findById(orderId).populate('user', ['fName', 'lName', 'email']);
+        if(!order){
+            return ores.status(404).json({message:"No order found", success:false})
+        }
+
+        return res.status(200).json({order})
+    }catch(error){
+        return res.status(500).json({message: "Internal server error", success: false})
+    }
+}
 export {login, getAdmin, logout, addProduct, getProduct, restockProduct, deleteProduct, getProducts, getOrders, getOrder}

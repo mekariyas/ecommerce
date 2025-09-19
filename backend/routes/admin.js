@@ -41,5 +41,5 @@ adminRoutes.delete('/deleteProduct', deleteProduct)
 
 
 adminRoutes.get("/orders", getOrders)
-adminRoutes.get("/order", getOrder)
+adminRoutes.get("/order/:orderId", getOrder)
 export default adminRoutes
