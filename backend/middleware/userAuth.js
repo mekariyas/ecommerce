@@ -8,7 +8,6 @@ const  userAuth =  (req, res, next)=>{
         return res.status(401).json({message: "No tokens provided, login or signup", success: false});
     }
 
-    const accessToken = userAccessToken.split(" ")[1]
     if(accessToken){
         jwt.verify(accessToken,process.env.SECRET_TOKEN,function (err, decoded){
             if(err){
