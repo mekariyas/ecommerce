@@ -13,6 +13,7 @@ import AdminProducts from "./admin/pages/Products"
 import Orders from "./admin/pages/Orders"
 import Order from "./admin/pages/Order"
 import EditProduct from "./admin/pages/EditProduct"
+import SearchProduct from "./admin/pages/SearchProduct"
 
 //User pages
 import SignIn from "./user/SignIn"
@@ -79,6 +80,10 @@ const App = () => {
         {
           path:"/dashboard/:id/products",
           element:<AdminProducts/>
+        },
+        {
+          path:"/dashboard/:id/product",
+          element: <SearchProduct/>
         },
         {
           path:"/dashboard/:id/orders",

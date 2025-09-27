@@ -4,6 +4,7 @@ import { CiTrash } from "react-icons/ci";
 import { FaRegEdit } from "react-icons/fa";
 
 import { AxiosError } from "axios"
+import { useAdminTokenStorage }  from "../../store/adminToken"
 
 import instance from "../../api/api.tsx"
 import Pagination from "../../components/pagination.tsx"
@@ -24,16 +25,19 @@ const Products = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const cloudName = import.meta.env.VITE_CLOUD_NAME
-
+  const token = useAdminTokenStorage((state)=>state.token)
+  const saveToken = useAdminTokenStorage((state)=>state.saveToken)
   const [searchParams, setSearchParams ] = useSearchParams()
 
   const [products, setProducts ] = useState<products[]>([])
   const [totalProducts, setTotalProducts] = useState<number>(0)
   const handleDataFetch = async()=>{
     try{
-        const dataFetched = await instance.get(`/admin/getProducts/?page=${searchParams.get("page")}&skip=${searchParams.get("skip") ?? 0}`,{withCredentials: true})
-        const { products , totalProducts } = dataFetched.data
-        
+        const dataFetched = await instance.get(`/admin/getProducts/?page=${searchParams.get("page")}&skip=${searchParams.get("skip") ?? 0}`,{headers:{
+        Authorization: `bearer ${token}`
+      },withCredentials:true})
+        const { products , totalProducts, accessToken } = dataFetched.data
+        saveToken(accessToken)
         setProducts(products)
         if(totalProducts % 5 === 0){
           setTotalProducts(totalProducts / 5)
@@ -42,6 +46,10 @@ const Products = () => {
         }
 
     }catch(error){
+      if(error instanceof AxiosError){
+        console.log(error.message)
+      }
+      console.log("error")
       console.log(error)
     }
   }
@@ -58,13 +66,11 @@ const Products = () => {
       const deleteData = await instance.delete("/admin/deleteProduct",{name: product})
     }catch(error){
       if (error instanceof AxiosError){
-          if(error.status === 500){
-            alert("Internal Server Error, please Try again")
-            navigate("/")
-          }else if (error.status == 404){
-            alert("no items found")
-            navigate("/")
+          if(error.status == 401){
+          alert("Unable to access This page, login or sign up")
+          return navigate("/admin")
           }
+          alert(error.response?.data.message)
         }
         else if (error instanceof Error){
           if(error.message === "Network Error"){
@@ -88,22 +94,8 @@ const Products = () => {
               <p className="md:text-lg font-semibold w-full">Description: {product.description}</p>
               <p className="md:text-lg font-semibold w-full">Price: {product.price} ETB</p>
               <p className="md:text-lg font-semibold w-full">Stock: {product.stock}</p>
-              <section className="md:text-lg font-semibold w-full flex">Sizes: {
-                product.size.length> 1? (<ul className="w-full flex  justify-start space-x-3">
-                  {product.size.map((prodSize,i)=>{
-                    return(<li key={i}>
-                      <p className="md:text-lg font-semibold"> {prodSize}</p>
-                    </li>)
-                  })}
-                </ul>): product.size}</section>
-              <section className="md:text-lg w-full flex font-semibold">Colors: {
-                product.color.length> 1? (<ul className="w-full flex  justify-start space-x-3">
-                  {product.color.map((prodColor,i)=>{
-                    return(<li key={i}>
-                      <p className="md:text-lg font-semibold"> {prodColor}</p>
-                    </li>)
-                  })}
-                </ul>): product.color}</section>
+              <p className="md:text-lg font-semibold w-full text-wrap">Sizes: {product.size.join(",")}</p>
+              <p className="md:text-lg font-semibold w-full text-wrap">Colors: {product.color.join(",")}</p>
             </section>
             <section className="w-full flex justify-center items-center gap-2 h-20">
                 <button className="bg-orange-500 w-[20%] h-[70%] rounded-lg text-center flex items-center justify-center text-white cursor-pointer" onClick={()=>handleEditPageRoute(product.name)}><FaRegEdit className="ml-2 w-[30%] h-[75%]"/></button>

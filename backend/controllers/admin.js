@@ -33,10 +33,10 @@ const login  = async (req,res)=>{
         if(!verifyUser){
             return res.status(401).json({message: "Incorrect password", success: false})
         }
-        const accessToken = jwt.sign({email:getUser.email, role: getUser.role},process.env.SECRET_TOKEN,{expiresIn: "15m"})
-        const refreshToken = jwt.sign({email:getUser.email, role: getUser.role}, process.env.SECRET_TOKEN,{expiresIn: "168h"})
+        const accessToken = jwt.sign({_id: getUser._id, role: getUser.role},process.env.ADMIN_SECRET_TOKEN,{expiresIn: "15m"})
+        const refreshToken = jwt.sign({_id: getUser._id, role: getUser.role}, process.env.ADMIN_SECRET_TOKEN,{expiresIn: "168h"})
 
-        res.cookie("jwt_cookie", refreshToken, {
+        res.cookie("adminCookie", refreshToken, {
             maxAge : 7 * 24 * 60 * 60 * 1000,
             httpOnly: true,
             sameSite: "lax",
@@ -53,13 +53,13 @@ const login  = async (req,res)=>{
 
 
 const logout = async(req, res)=>{
-    const cookie = req.cookies?.jwt_cookie
+    const cookie = req.cookies?.adminCookie
 
     if (!cookie){
         return res.status(404).json({message: "cookie not found", success: false})
     }
 
-    res.clearCookie("jwt_cookie",{
+    res.clearCookie("adminCookie",{
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production"})
@@ -75,10 +75,11 @@ const getAdmin = async(req, res) => {
         if(!admin){
             return res.status(404).json({message: "Admin not found"})
         }
-        return res.status(200).json({firstName: admin.fName ,lastName: admin.lName})
+        const accessToken = jwt.sign({_id: admin._id, role:admin.role},process.env.SECRET_TOKEN,{expiresIn: "15m"})
+        return res.status(200).json({firstName: admin.fName ,lastName: admin.lName, accessToken})
     }
-    catch(error){
-        
+    catch(error){ 
+        console.log("Error Admin")  
         console.log(error.message)
         return res.status(500).json({message:"Internal Server Error", success: false})
     }
@@ -90,16 +91,20 @@ const getAdmin = async(req, res) => {
 const addProduct = async(req, res)=>{
     const { name, price, brand, description, size ,stock, color} = req.body
     const image = req.file?.filename
+    const adminId = req.userId;
     if( !name || !price || !brand || !description || !size  ||!stock ||!color || !image ){
         return res.status(400).json({message: "Incomplete data", success: false})
     }
+
     try{
         const itemStored = await Product.findOne({name: name})
         if(itemStored){
             return res.status(409).json({message:"Item already exists", success:false})
         }
         await Product.create({name:name, price:Number(price), brand:brand, description: description, stock: Number(stock), size: size.split(","), color: color.split(","), image:image})
-        return res.status(201).json({message:"Item created", success: true})
+        
+        const accessToken = jwt.sign({_id: decodedToken._id, role:decodedToken.role},process.env.SECRET_TOKEN,{expiresIn: "15m"})
+        return res.status(201).json({message:"Item Created", accessToken})
     }catch(error){
         console.log(error.message)
         return res.status(500).json({message:"Internal server Error"})    
@@ -111,7 +116,10 @@ const getProducts = async(req, res)=>{
         const skip = parseInt(req.query.skip) || 0
         const totalProducts = await Product.countDocuments({});
         const products = await  Product.find({stock:{$gt:0}}).skip(skip).limit(5);
-        return res.status(200).json({products:products, totalProducts})
+        const adminId = req.userId;
+        const accessToken = jwt.sign({_id: adminId, role:"admin"},process.env.SECRET_TOKEN,{expiresIn: "15m"})
+        
+        return res.status(200).json({products:products, totalProducts, accessToken})
     }catch(error){
         return res.status(500).json({message: "Internal server error", success: false})
     }
@@ -119,6 +127,7 @@ const getProducts = async(req, res)=>{
 
 const getProduct  = async(req, res)=>{
     const { name } = req.params;
+    const adminId = req.userId;
     if(!name){
         return res.status(400).json({message: "No query defined", success:false})
     }
@@ -127,7 +136,8 @@ const getProduct  = async(req, res)=>{
     if(!item){
         return res.status(404).json({message: "Item not found", success:false})
     }
-    return res.status(200).json({item})
+    const accessToken = jwt.sign({_id: adminId, role:"admin"},process.env.SECRET_TOKEN,{expiresIn: "15m"})
+    return res.status(200).json({item, accessToken})
     }catch(error){
         
         console.log(error.message)
@@ -139,12 +149,14 @@ const getProduct  = async(req, res)=>{
 const restockProduct = async(req, res)=>{
     const {name, price, brand, description, stock, color} = req.body
     const image = req.file?.filename ?? req.body.image
+    const adminId = req.userId
     if(!name){
         return res.status(401).json({message:"Product name not provided", success: false})
     }
     try{
         await Product.findOneAndUpdate({name: name}, {name:name, price:price, brand:brand, description:description, stock:stock, color:color, image: '../uploads/shoe-items/' + image})
-        return res.status(200).json({message:"Product Updated", success:true})
+        const accessToken = jwt.sign({_id: adminId, role:"admin"},process.env.SECRET_TOKEN,{expiresIn: "15m"})
+        return res.status(200).json({message:"Product Updated", success:true, accessToken})
     }
     catch(error){
         
@@ -155,16 +167,18 @@ const restockProduct = async(req, res)=>{
 
 const deleteProduct   = async(req, res)=>{
     const {name} = req.body
+    const adminId = req.userId
     if(!name){
         return res.status(401).json({message:"Product name not provided", success: false})
     }
     try{
         const findItem = await Product.findOne({name: name})
+        const accessToken = jwt.sign({_id: adminId, role:"admin"},process.env.SECRET_TOKEN,{expiresIn: "15m"})
         if(!findItem){
             return res.status(404).json({message:"Product does not exist", success: false})
         } 
         await Product.findOneAndDelete({name:name})
-        return res.status(204).json({message:"Product deleted", success: true})
+        return res.status(204).json({message:"Product deleted", success: true, accessToken})
     }
     catch(error){
         
@@ -176,6 +190,7 @@ const deleteProduct   = async(req, res)=>{
 
 const getOrders = async(req, res)=>{
     try{
+        const adminId = req.userId
         const skip = parseInt(req.query.skip) || 0
         const totalOrders = await Order.countDocuments({});
         const orders = await Order.find({status:"Pending"}).skip(skip).limit(5).sort({createdAt: -1})
@@ -183,7 +198,8 @@ const getOrders = async(req, res)=>{
         for(const order of orders){
             allOrders = [...allOrders, await order.populate('user', ['fName', 'lName', 'email'])]
         }
-        return res.status(200).json({orders: allOrders, totalOrders})
+        const accessToken = jwt.sign({_id: adminId, role:"admin"},process.env.SECRET_TOKEN,{expiresIn: "15m"})
+        return res.status(200).json({orders: allOrders, totalOrders, accessToken})
     }catch(error){
         console.log(error.message)
         return res.status(500).json({message: "Internal server error", success: false})
@@ -192,18 +208,21 @@ const getOrders = async(req, res)=>{
 
 const getOrder = async(req , res)=>{
     const { orderId } = req.params
+    const adminId = req.userId
     if(!orderId){
         return res.status(400).json({message: "No query defined", success:false})
     }
     try{
         const order = await Order.findById(orderId).populate('user', ['fName', 'lName', 'email']);
         if(!order){
-            return ores.status(404).json({message:"No order found", success:false})
+            return res.status(404).json({message:"No order found", success:false})
         }
-
-        return res.status(200).json({order})
+         const accessToken = jwt.sign({_id: adminId, role:"admin"},process.env.SECRET_TOKEN,{expiresIn: "15m"})
+        return res.status(200).json({order, accessToken})
     }catch(error){
         return res.status(500).json({message: "Internal server error", success: false})
     }
 }
+
+
 export {login, getAdmin, logout, addProduct, getProduct, restockProduct, deleteProduct, getProducts, getOrders, getOrder}

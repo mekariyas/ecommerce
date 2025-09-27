@@ -5,6 +5,9 @@ import { useNavigate } from 'react-router-dom'
 import instance from "../../api/api.tsx"
 import { BiHide,BiShow } from "react-icons/bi"
 
+import { useAdminTokenStorage } from "../../store/adminToken.ts"
+
+
 const LoginForm = () => {
   const [show, setShow ] = useState<boolean>(false)
 
@@ -17,15 +20,17 @@ const LoginForm = () => {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [isSuccess, setIsSuccess ] = useState<boolean>(true)
   const [isLoading, setIsLoading] = useState<boolean>(false)
+
+  const saveToken = useAdminTokenStorage((state)=>state.saveToken)
   const navigate = useNavigate() 
 
   const handleSubmit = async( e:FormEvent )=>{
     setIsLoading(true)
     e.preventDefault()
     try{
-      const sendData = await instance.post("/admin/adminLogin",{email, password})
-      console.log(sendData)
-      const { id } = await sendData.data
+      const sendData = await instance.post("/admin/adminLogin",{email, password}, {withCredentials:true})
+      const { id, accessToken } = await sendData.data
+      saveToken(accessToken)
       navigate(`/dashboard/${id}`)
       setIsLoading(false)
     }

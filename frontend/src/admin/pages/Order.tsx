@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
-
+import { AxiosError } from "axios"
 import { useNavigate, useParams } from "react-router-dom"
-
+import { useAdminTokenStorage }  from "../../store/adminToken"
 import instance from "../../api/api"
 
 
@@ -20,7 +20,7 @@ interface OrderInfo{
         city:string,
         houseNumber: string,
         phoneNumber: string,
-        streetNumber: string,
+        streetName: string,
         subCity: string,
     },
     user:{
@@ -38,6 +38,8 @@ const Order = () => {
     const cloudName = import.meta.env.VITE_CLOUD_NAME
     const { orderId }  = useParams()
     const navigate = useNavigate()
+    const token = useAdminTokenStorage((state)=>state.token)
+    const saveToken = useAdminTokenStorage((state)=> state.saveToken)
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [orderInfo, setOrderInfo] = useState<OrderInfo>({
         OrderList:[],
@@ -45,7 +47,7 @@ const Order = () => {
             city:"",
             houseNumber: "",
             phoneNumber: "",
-            streetNumber: "",
+            streetName: "",
             subCity: "",
         },
         user:{
@@ -60,12 +62,23 @@ const Order = () => {
     const handleOrderFetch = async()=>{
         setIsLoading(true)
         try{
-            const orderData = await instance.get(`/admin/order/${orderId}`, {withCredentials: true})
-            const {order} = orderData.data
-
+            const orderData = await instance.get(`/admin/order/${orderId}`, {headers:{
+            Authorization: `bearer ${token}`
+            },withCredentials:true})
+            const {order, accessToken} = orderData.data
+            saveToken(accessToken)
             setOrderInfo({...orderInfo, OrderList:[...order.OrderList],address:{...order.address},user:{...order.user}, status: order.status,totalPrice: order.totalPrice})
         }catch(error){
-            console.log(error)
+            if(error instanceof AxiosError){
+                if(error.status == 401){
+                    alert("Unable to access This page, login or sign up")
+                    return navigate("/admin")
+            }
+                alert(error.response?.data.message || "Please try again")
+            }
+            else if (error instanceof Error){
+                alert(error.message) 
+            }    
         }finally{
             setIsLoading(false)
         }
@@ -108,7 +121,7 @@ const Order = () => {
                     <p className="md:text-lg mt-2">Email: {orderInfo.user.email}</p>
                     <p className="md:text-lg mt-2">City: {orderInfo.address.city}</p>
                     <p className="md:text-lg mt-2">Sub-City: {orderInfo.address.subCity}</p>
-                    <p className="md:text-lg mt-2">Street-Number: {orderInfo.address.streetNumber}</p>
+                    <p className="md:text-lg mt-2">Street-Name: {orderInfo.address.streetName}</p>
                     <p className="md:text-lg mt-2">House-Number: {orderInfo.address.houseNumber}</p>
                     <p className="md:text-lg mt-2">Phone number: {orderInfo.address.phoneNumber}</p>
                 </section>

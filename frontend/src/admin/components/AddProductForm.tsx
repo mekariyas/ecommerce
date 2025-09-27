@@ -2,15 +2,14 @@ import { useState, useEffect,FormEvent } from 'react'
 import { AxiosError } from 'axios'
 import { BiCamera } from 'react-icons/bi'
 import instance from "../../api/api.tsx"
-
-
+import {useNavigate} from "react-router-dom" 
 import NotificationCard from "../../components/NotificationCard.tsx"
 
 
 const AddProductForm = () => {
 
   const [isUpLoading,setIsUpLoading ] = useState<boolean>(false)
-
+  const navigate = useNavigate()
   //form state
   const [ name, setName] = useState<string>("")
   const [price, setPrice] = useState<number>(500)
@@ -68,17 +67,13 @@ const AddProductForm = () => {
       }
     }catch(error){
       if(error instanceof AxiosError){
-        console.log(error)
-        setIsUpLoading(false)
-        if(error.status == 409){
-          setStatusText("Product already Exists")
-          setNotificationVisibility(true)
-        return
+        if (error.status === 401){
+           alert("Unable to access this page Login again")
+            return navigate("/admin")
         }
-        setStatusText(error.message)
-        setNotificationVisibility(true)
-        return
-      }
+        setStatusText(error.response?.data.message)
+        setIsUpLoading(false)
+      } 
       setIsUpLoading(false)
       setStatusText("Internal server Error. Please Try again")
       setNotificationVisibility(true)
@@ -109,7 +104,7 @@ const AddProductForm = () => {
         <label className="md:w-[30%] md:ml-2">Image:</label>
         <section className="w-[85%] md:w-[30%] ml-4 md:ml-2 mb-2 flex h-7 relative cursor-pointer">
             <input type="file" required name="Image" accept="image/*" className="w-[75%] not-valid:outline-red-700 rounded-sm" onChange={(e)=> setImage(e.target.files?.[0] || null)}/>
-            <BiCamera className="rounded-sm border-[1px]  border-white h-full w-[20%] md:w-[25%] absolute left-0 z-[2] bg-blue-950 text-white pointer-events-none"/>
+            <BiCamera className="rounded-sm border-[1px]  border-white h-full w-[20%] md:w-[20%] absolute left-0 z-[2] bg-blue-950 text-white pointer-events-none"/>
         </section>
         <input type="submit" value={isUpLoading?"Uploading...":"Add Product"} disabled={isUpLoading} className={`border-blue-950 border-[1px] w-[95%] md:ml-2 md:w-[30%] h-10 font-bold rounded-sm mb-2 cursor-pointer ${isUpLoading? "bg-slate-600 cursor-not-allowed":""}`}/>
       </form>

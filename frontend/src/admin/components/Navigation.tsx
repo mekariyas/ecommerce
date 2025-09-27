@@ -1,5 +1,9 @@
 import {useParams ,useNavigate }  from "react-router-dom"
 import { FaX } from "react-icons/fa6"
+import { AxiosError} from "axios"
+
+import instance from "../../api/api"
+import { useAdminTokenStorage } from "../../store/adminToken"
 
 interface state{
   isVisible: boolean,
@@ -10,7 +14,23 @@ interface state{
 const Navigation = ({...props}: state) => {
   const { id } = useParams()
   const navigate = useNavigate()
-  
+
+  const clearAdminToken = useAdminTokenStorage(state=>state.clearToken)
+  const handleLogOut = async()=>{
+    try{
+      const logOut = await instance.get('/admin/adminLogOut', {withCredentials:true})
+      clearAdminToken()
+      navigate("/admin")
+    }catch(error){
+      if(error instanceof AxiosError){
+        alert(error.message)
+      }
+      else if(error instanceof Error){
+        alert("Error occurred pleas try again")
+      }
+    }
+    
+  }
   return (
     <aside className={`${props.isVisible? "sm:flex" :"hidden"} flex-col items-center md:flex absolute md:sticky md:top-16 z-[10] top-0 font-medium right-0 md:sticky w-[60%] h-[100vh] md:w-[15%] md:h-[89.5vh] md:mt-16 pt-4 text-lg md:text-xl border-[1px] border-black  bg-slate-950 text-white overflow-y-hidden`}>
         <button className="border-[1px] border-white w-[100%] md:w-[70%] h-14  grid place-items-center rounded-sm  md:hidden cursor-pointer" onClick={props.handleVisibility}><FaX/></button>
@@ -18,7 +38,7 @@ const Navigation = ({...props}: state) => {
         <button className="mt-2 mb-2 w-[100%] md:w-[70%] min-h-10 border-[1px] border-white rounded-sm cursor-pointer" onClick={()=>navigate(`/dashboard/${id}/addProduct`)}>Add Product</button>
         <button className="mt-2 mb-2 w-[100%] md:w-[70%] h-10 border-[1px] border-white rounded-sm cursor-pointer" onClick={()=>navigate(`/dashboard/${id}/products?page=1`)}>Products</button>
         <button className="mt-2 mb-2 w-[100%] md:w-[70%] h-10 border-[1px] border-white rounded-sm cursor-pointer" onClick={()=>navigate(`/dashboard/${id}/orders?page=1`)}>Orders</button>
-        <button className="mt-2 mb-2 w-[100%] md:w-[70%] h-10 border-[1px] border-white rounded-sm cursor-pointer">Logout</button>
+        <button className="mt-2 mb-2 w-[100%] md:w-[70%] h-10 border-[1px] border-white rounded-sm cursor-pointer" onClick={handleLogOut}>Logout</button>
     </aside>
   )
 }

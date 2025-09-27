@@ -1,7 +1,12 @@
 import multer from "multer"
 import express from "express"
 import upload from "../middleware/cloudinaryStorage.js"
+
+import adminAuth from "../middleware/adminAuth.js"
+
 import { login, getAdmin, logout, addProduct, getProduct, getProducts,restockProduct, deleteProduct, getOrders, getOrder} from "../controllers/admin.js"
+
+
 import createAdmin from "../controllers/createAdmin.js"
 
 const uploadFile = upload.single('shoes')
@@ -30,11 +35,13 @@ adminRoutes.post('/adminLogin', login)
 adminRoutes.get('/adminLogOut', logout)
 
 //admin information request
-adminRoutes.get("/adminInfo/:id", getAdmin)
+
+adminRoutes.use(adminAuth)
+adminRoutes.get("/adminInfo/:id",getAdmin)
 
 //product CRUD requests
 adminRoutes.get('/getProduct/:name',getProduct)
-adminRoutes.get("/getProducts", getProducts)
+adminRoutes.get("/getProducts",getProducts)
 adminRoutes.post('/newProduct',UploadMiddleware,addProduct)
 adminRoutes.put('/restock',UploadMiddleware,restockProduct)
 adminRoutes.delete('/deleteProduct', deleteProduct)
