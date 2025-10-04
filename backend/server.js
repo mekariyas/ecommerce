@@ -5,6 +5,8 @@ import cookieParser from "cookie-parser"
 import connectDb from "./db/connectDb.js"
 import adminRoutes from "./routes/admin.js"
 import userRoutes from "./routes/user.js"
+import helmet from "helmet"
+import { rateLimit } from "express-rate-limit"
 
 //allow access to environment variables
 dotenv.config()
@@ -12,7 +14,17 @@ dotenv.config()
 
 const app = express()
 
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 100,
+    standardHeaders: true,
+    legacyHeaders: false,
+    ipv6Subnet: 56,
+    message: "Too many requests, please try again later",
+    statusCode: 429
+})
 
+app.use(helmet())
 
 //allow json parsing for incoming requests
 app.use(express.json())
@@ -28,8 +40,7 @@ app.use(cors({
 
 await connectDb().catch((err)=>{console.log(err.message)})
 
-//Static files
-// app.use(express.static("uploads/shoe-items"))
+app.use(limiter)
 
 //admin route middleware
 app.use('/admin',adminRoutes)
