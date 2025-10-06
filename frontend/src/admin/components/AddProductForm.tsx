@@ -5,8 +5,12 @@ import instance from "../../api/api.tsx"
 import {useNavigate} from "react-router-dom" 
 import NotificationCard from "../../components/NotificationCard.tsx"
 
+import { useAdminTokenStorage }  from "../../store/adminToken"
 
 const AddProductForm = () => {
+
+  const token = useAdminTokenStorage((state)=>state.token)
+  const saveToken = useAdminTokenStorage((state)=>state.saveToken)
 
   const [isUpLoading,setIsUpLoading ] = useState<boolean>(false)
   const navigate = useNavigate()
@@ -23,6 +27,21 @@ const AddProductForm = () => {
   const [statusText, setStatusText] = useState<string>("")
   const [notificationVisibility,setNotificationVisibility] =  useState<boolean>(false)
 
+  const isAuth = async ()=>{
+        try{
+          const isLoggedIn = await instance.get("/admin/refresh", {withCredentials:true})
+          saveToken(isLoggedIn.data.accessToken)
+        }catch(error){
+          if(error instanceof Error || error instanceof AxiosError){
+            saveToken("")
+          }
+        }
+      }
+  
+      useEffect(()=>{
+        isAuth()
+      },[])
+
   useEffect(()=>{
     if(notificationVisibility){
       const timer = setTimeout(() => {
@@ -31,6 +50,8 @@ const AddProductForm = () => {
       return ()=> clearTimeout(timer)
     }
   },[notificationVisibility])
+
+
 
   const handleFormSubmit = async(e : FormEvent)=>{
     e.preventDefault()
@@ -50,7 +71,12 @@ const AddProductForm = () => {
       formData.append("shoes", image)
     try{
       setIsUpLoading(true)
-      const sendShoesData = await instance.post("/admin/newProduct", formData)
+      const sendShoesData = await instance.post("/admin/newProduct", formData ,{
+        headers: {
+          Authorization: `bearer ${token}`
+        },
+        withCredentials: true
+      })
       if(sendShoesData.status === 200){
         const { data } = sendShoesData.data
         setIsUpLoading(false)

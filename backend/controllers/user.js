@@ -15,7 +15,7 @@ const refresh =(req, res)=>{
   try {
     const decoded = jwt.verify(refreshToken, process.env.SECRET_TOKEN);
     const accessToken = jwt.sign(
-      { id: decoded.id },
+      { _id: decoded._id, role: decoded.role },
       process.env.SECRET_TOKEN,
       { expiresIn: "15m" }
     );
@@ -26,10 +26,8 @@ const refresh =(req, res)=>{
 }
 
 const signUp = async (req, res) => {
-    const {firstName, lastName, email, password } = req.body;
-    if(!firstName || !lastName || !email || !password ){
-        res.status(400).json({message:"Missing email or password", success:false})
-    }
+
+    const {firstName, lastName, email, password } = req.userInfo;
     try{
         const findUser = await User.findOne({email: email})
         if(findUser){
@@ -86,7 +84,7 @@ const signIn = async (req,res) => {
 
 const getProducts = async (req, res) => {
     try{
-        const skip = parseInt(req.query.skip) || 0
+        const { skip } =  req.queryData
         const totalProducts = await Product.countDocuments({});
         const products = await  Product.find({stock:{$gt:0}}).skip(skip).limit(5);
         const jwt_cookie = req.cookies?.userCookie
@@ -142,27 +140,27 @@ const placeOrder = async(req, res)=>{
     const totalPrice = order.reduce((prev,curr)=>{
         return prev + curr.price
     },0)
-
+ 
     try{
-        const findUser = await User.findById(userId)
-        if(!findUser){
-            return res.status(404).json({message:"User not found login or sign up", success:false})
-        }
-        const session = await mongoose.startSession()
-        session.startTransaction()
-        for(const item of order){
+         const findUser = await User.findById(userId)
+         if(!findUser){
+           return res.status(404).json({message:"User not found login or sign up", success:false})
+         }
+         const session = await mongoose.startSession()
+         session.startTransaction()
+         for(const item of order){
             try{
                 const product = await Product.findById(item._id).session(session)
                 if(!product){
                     throw new Error( "Product not found")
                 }
                 else if (product.stock < item.amount){
-                    throw new Error("Not enough stock")
+                     throw new Error("Not enough stock")
                 }
                 product.stock -= item.amount
 
                 await product.save({session})
-               
+              
             }catch(error){
                 console.log(error.message)
                 return res.status(400).json({message:`${error.message}`, success:false})

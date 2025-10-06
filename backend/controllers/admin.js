@@ -14,6 +14,25 @@ import Order from "../models/order.js"
 
 //admin
 
+const refresh =(req, res)=>{
+    const refreshToken = req.cookies.userCookie;
+    if (!refreshToken){
+        return res.status(401).json({ message: "No token" })
+    };
+    
+  try {
+    const decoded = jwt.verify(refreshToken, process.env.ADMIN_SECRET_TOKEN);
+    const accessToken = jwt.sign(
+      { _id: decoded._id, role: decoded.role },
+      process.env.ADMIN_SECRET_TOKEN,
+      { expiresIn: "15m" }
+    );
+    res.json({ accessToken });
+  } catch (err) {
+    res.status(403).json({ message: "Invalid refresh token" });
+  }
+}
+
 const login  = async (req,res)=>{
     const { email, password } = req.body
     
@@ -113,7 +132,7 @@ const addProduct = async(req, res)=>{
 
 const getProducts = async(req, res)=>{
     try{
-        const skip = parseInt(req.query.skip) || 0
+        const { skip } =  req.queryData
         const totalProducts = await Product.countDocuments({});
         const products = await  Product.find({stock:{$gt:0}}).skip(skip).limit(5);
         const adminId = req.userId;
@@ -225,4 +244,4 @@ const getOrder = async(req , res)=>{
 }
 
 
-export {login, getAdmin, logout, addProduct, getProduct, restockProduct, deleteProduct, getProducts, getOrders, getOrder}
+export {login, getAdmin, logout, addProduct, getProduct, restockProduct, deleteProduct, getProducts, getOrders, getOrder, refresh}

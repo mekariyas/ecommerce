@@ -31,18 +31,21 @@ const DeliveryForm = ({...props}: {setIsAddressFormVisible:(val:boolean)=>void})
 
   const handleSubmission = async( e: FormEvent )=>{
     e.preventDefault()
+    console.log({order:Orders, address:formData, accessToken:token})
     try{
       setIsSubmitting(true)
         const order  = await instance.post(`/user/placeOrder`,{order:Orders, address:formData},{
           headers:{
-            authorization: `bearer ${token}`
-          },withCredentials:true
-        })
-            alert("Order has been placed")
-            clearCart()
-            props.setIsAddressFormVisible(false)
+            Authorization: `bearer ${token}`
+        },
+        withCredentials: true
+      })
+      alert("Order has been placed")
+      clearCart()
+      props.setIsAddressFormVisible(false)
             
     }catch(error){
+      console.log(error)
         if (error instanceof AxiosError){
           if (error.status === 401 || error.status === 404){
             alert("Please login or signUp")

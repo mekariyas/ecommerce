@@ -29,7 +29,7 @@ const LoginForm = () => {
     try{
       const sendData = await instance.post("/user/signIn",{email, password} ,{withCredentials: true})
       saveToken(sendData.data.accessToken)
-      navigate(`/products/?page=1`)
+      navigate(`/products/?page=1&skip=0`)
       setIsLoading(false)
     }
     catch(error){

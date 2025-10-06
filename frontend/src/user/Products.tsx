@@ -91,22 +91,8 @@ const Products = () => {
                 <p className="md:text-lg font-semibold w-full">Description: {product.description}</p>
                 <p className="md:text-lg font-semibold w-full">Price: {product.price} ETB</p>
                 <p className="md:text-lg font-semibold w-full">Stock: {product.stock}</p>
-                <section className="md:text-lg font-semibold w-full flex">Sizes: {
-                product.size.length> 1? (<ul className="w-full flex  justify-start space-x-3">
-                  {product.size.map((prodSize,i)=>{
-                    return(<li key={i}>
-                      <p className="md:text-lg font-semibold"> {prodSize}</p>
-                    </li>)
-                  })}
-                </ul>): product.size}</section>
-                <section className="md:text-lg w-full flex font-semibold">Colors: {
-                product.color.length> 1? (<ul className="w-full flex  justify-start space-x-3">
-                  {product.color.map((prodColor,i)=>{
-                    return(<li key={i}>
-                      <p className="md:text-lg font-semibold"> {prodColor}</p>
-                    </li>)
-                  })}
-                </ul>): product.color}</section>
+                <p className="md:text-lg font-semibold w-full">Sizes: {product.size.join(",")}</p>
+                <p className="md:text-lg font-semibold w-full">Color: {product.color.join(",")}</p>
               </section>
               <section className="w-full flex justify-center items-center mt-2 md:mt-1">
                 <button className="border-2 w-38 h-10 font-semibold text-white bg-blue-600 rounded-md cursor-pointer" onClick={()=>handleOrderFormNavigation(product.name)}>Add To Cart</button>

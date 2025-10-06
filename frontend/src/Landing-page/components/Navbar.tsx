@@ -53,7 +53,7 @@ const Navbar = () => {
         </section>
         <nav className={`${!isVisible? "hidden" : ""} flex flex-col md:flex  md:flex-row justify-evenly items-center absolute md:static top-20 w-full h-[30vh] md:h-full bg-white   md:w-[70%] md:ml-40 text-lg md:text-2xl bg-none`}>
             <Link to="/" className="w-full md:w-[20%] text-center">Home</Link>
-            <Link to="/products/?page=1" className="w-full md:w-[20%] text-center">Products</Link>
+            <Link to="/products/?page=1&skip=0" className="w-full md:w-[20%] text-center">Products</Link>
             <Link to="/cart" className="w-full md:w-[20%] flex justify-center"><BiCart className="w-12 h-8"/></Link>
             {token? 
               (<button className="w-[80%] md:w-36 rounded-lg shadow-xl cursor-pointer text-white font-bold bg-red-600 shadow-slate-200 pb-2" onClick={handleLogout} disabled={isLoggingOut}>Log out</button>):

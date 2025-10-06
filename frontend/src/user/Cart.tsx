@@ -20,12 +20,13 @@ interface product{
 
 
 const Cart = () => {
-
+  const [isAuthorized, setIsAuthorized] = useState<boolean>(false)
   const setToken = useTokenStorage(state=>state.saveToken)
   const isAuth = async ()=>{
       try{
         const isLoggedIn = await instance.get("/user/refresh", {withCredentials:true})
         setToken(isLoggedIn.data.accessToken)
+        setIsAuthorized(true)
       }catch(error){
         if(error instanceof Error || error instanceof AxiosError){
           setToken("")
@@ -53,7 +54,8 @@ const Cart = () => {
     setItems([...Orders])
   },[Orders])
   return (
-    <section className="w-full mt-1 flex flex-col items-center">
+    <>
+    {isAuthorized ?(<section className="w-full mt-1 flex flex-col items-center">
       {items.length === 0? (<p className="text:lg mt-10 text-center w-full font-bold">Cart is empty</p>):(
         <>
         {isAddressFormVisible && (<DeliveryForm setIsAddressFormVisible={setIsAddressFormVisible}/>)}
@@ -80,7 +82,8 @@ const Cart = () => {
         <button className="mt-3 mb-3 w-[82%] md:w-[38%] h-14 bg-slate-600 rounded-md font-bold text-lg text-white cursor-pointer" onClick={()=>setIsAddressFormVisible(true)}>Check Out</button>
         <button onClick={handleClearCart} className="mb-2 w-[82%] md:w-[38%] h-14 bg-red-600 rounded-md font-bold text-lg text-white cursor-pointer" >Clear Cart</button>
         </>)}
-    </section>
+    </section>):(<p className="mt-10 text-lg md:text-xl font-semibold">Login/ sign up to view items added to the Cart</p>)}
+  </>
   )
 }
 

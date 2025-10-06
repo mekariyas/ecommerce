@@ -54,7 +54,9 @@ const OrderForm = () => {
         image: item.image
       });      
     }catch(error){
+      
       if (error instanceof AxiosError){
+        console.log(error)
         if (error.status === 401 || error.status === 404){
           alert("Please login or signUp")
           navigate(-1)
