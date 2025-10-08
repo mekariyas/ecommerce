@@ -26,8 +26,8 @@ const refresh =(req, res)=>{
 }
 
 const signUp = async (req, res) => {
-
-    const {firstName, lastName, email, password } = req.userInfo;
+    
+    const {firstName, lastName, email, password } = req.body;
     try{
         const findUser = await User.findOne({email: email})
         if(findUser){
@@ -54,12 +54,14 @@ const signUp = async (req, res) => {
 }
 
 const signIn = async (req,res) => {
+   
     const { email, password } = req.body;
     try{
-        const findUser = await User.findOne({email: email})
+        const findUser = await User.findOne({email:email})
         if(!findUser){
             return res.status(404).json({message:"User not found", success: false})
         } 
+
         const verifyUser  = await bcrypt.compare(password, findUser.password) 
         if(!verifyUser){
             return res.status(401).json({message: "Incorrect password", success: false})
@@ -83,10 +85,15 @@ const signIn = async (req,res) => {
 }
 
 const getProducts = async (req, res) => {
+    
     try{
-        const { skip } =  req.queryData
+        const { skip } =  parseInt(req.queryData)
         const totalProducts = await Product.countDocuments({});
         const products = await  Product.find({stock:{$gt:0}}).skip(skip).limit(5);
+        if(products.length == 0){
+            return res.status(404).json({message:"No products found", success:false})
+        }
+        
         const jwt_cookie = req.cookies?.userCookie
         if(!jwt_cookie){
             return res.status(200).json({products:products, totalProducts: totalProducts, accessToken:""})

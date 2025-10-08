@@ -8,10 +8,10 @@ import { body, validationResult } from "express-validator"
 //place order - order - address
 
 const signUpValidate= [
-    body('email').escape().trim().notEmpty().isEmail().withMessage("Valid Email is Required"), 
-    body('password').escape().trim().notEmpty().isLength({min:5}).withMessage('Password is required'), 
-    body('firstName').escape().trim().notEmpty().withMessage('first name is required'), 
-    body('lastName').escape().trim().notEmpty().withMessage('last name is required')
+    body('email').trim().escape().notEmpty().isEmail().withMessage("Valid Email is Required"), 
+    body('password').trim().escape().notEmpty().withMessage('Password is required'), 
+    body('firstName').trim().escape().notEmpty().withMessage('first name is required'), 
+    body('lastName').trim().escape().notEmpty().withMessage('last name is required')
 ] 
 
 const  logInValidate = [ 

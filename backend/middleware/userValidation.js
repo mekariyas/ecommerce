@@ -4,7 +4,8 @@ const validateSignUp = (req, res, next)=>{
     const errors = validationResult(req)
     if(errors.isEmpty()){
         const userData = matchedData(req)
-        req.userInfo = {firstName: userData.firstName, lastName:userData.lastName, email: userData.email, password: userData.password}
+        
+        req.body = { ...req.body ,firstName: userData.firstName, lastName:userData.lastName, email: userData.email, password: userData.password}
         return next()
     }
     return res.status(400).json({errors: errors.array()[0].msg, success:false})
@@ -16,6 +17,7 @@ const validateLogin = (req,res,next)=>{
     const errors = validationResult(req)
     if(errors.isEmpty()){
         const userData = matchedData(req)
+        
         req.userData = {email: userData.email, password:userData.password}       
         return next()    
     }

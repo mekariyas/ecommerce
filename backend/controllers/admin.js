@@ -35,11 +35,6 @@ const refresh =(req, res)=>{
 
 const login  = async (req,res)=>{
     const { email, password } = req.body
-    
-    if (!email || !password){
-        return res.status(400).json({message:"Missing email or password", success:false})
-    }
-    
     try{
         const getUser  = await User.findOne({email:email})
         if(!getUser){
