@@ -6,10 +6,10 @@ import About from "./components/About.tsx"
 const Index = () => {
   return (
     <>
-    <section className="w-full h-[100vh]">
-            <img src={Hero} alt="Hero-image" loading="lazy" className="w-[100%] object-cover h-full"/>
-            <section className="w-full h-[100vh]  absolute z-[2] top-0 flex items-center justify-center">
-              <h1 className="text-white text-shadow-lg text-shadow-black font-extrabold text-6xl text-center  md:text-8xl text-wrap">Unveil our stylish collections</h1>
+    <section className="w-full flex  flex-col flex-wrap md:flex-row md:justify-between overflow-hidden">
+            <img src={Hero} alt="Hero-image" loading="lazy" className="w-[100%] md:w-[50%] h-[100vh] object-cover"/>
+            <section className="w-[100%] md:w-[50%] h-[100vh] bg-red-600 flex items-center justify-center">
+              <h1 className="text-white  text-shadow-lg text-shadow-black font-extrabold text-3xl md:text-6xl text-center  text-wrap">Unveil our stylish collections</h1>
             </section>
         </section>
         <About/>

@@ -1,5 +1,5 @@
 # Mernstack + zustand ecommerce store
-This is a mernstack ecommerce project that uses zustand for state management. It has user and admin routes each authenticated using jwt tokens.
+This is a mernstack ecommerce project that uses zustand for state management. It has user and admin routes each authenticated using jwt tokens. I didn't include a payment gateway because stripe is not available in my country adn the ones available in here do not have a free tier.
 
 ## Frontend
 - Tailwind Css

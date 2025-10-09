@@ -21,9 +21,10 @@ const BrandSlider = ()=>{
         speed: 2000,
         autoplaySpeed: 2000,
         arrows: false,
+        cssEase: "linear"
     }
     return(
-        <section id="brands" className="bg-amber-700 w-full h-[60vh] space-x-4">
+        <section id="brands" className="bg-red-600 w-full h-[60vh] space-x-4">
             <Slider {...settings}>
                 <div>
                     <div className="w-[60%] h-[60vh] flex items-center justify-center ml-6">
