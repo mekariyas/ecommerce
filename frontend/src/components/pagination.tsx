@@ -9,6 +9,7 @@ const Pagination = ({...props}: {totalProducts: number, id? :string}) => {
   const [buttons, setButtons] = useState<number[]>([])
   
   let numbers:number[] = []
+
   
   const handleButtonsPopulation = (num: number)=>{
     if (num == 0 ){

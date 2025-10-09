@@ -21,8 +21,8 @@ const EditProduct = () => {
     //product data
 
     const navigate = useNavigate()
-    const { name } = useParams();
-    const [productName, setProductName] = useState<string>(name)
+    const { name }  = useParams();
+    const [productName, setProductName] = useState<string>("")
     const [price, setPrice] = useState<number>(0)
     const [brand, setBrand] = useState<string>("")
     const [description,setDescription] = useState<string>("")
@@ -75,6 +75,9 @@ const EditProduct = () => {
 
     //fetch data on the first render
     useEffect(()=>{
+        if(name){
+            setProductName(name)
+        }
         handleDataFetch()
     },[])
 
