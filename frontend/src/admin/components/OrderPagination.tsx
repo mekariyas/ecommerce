@@ -35,7 +35,7 @@ const OrderPagination = ({ orderAmount }: { orderAmount: number }) => {
           <li key={button} className="w-16 h-16 mb-4">
             <button
               onClick={() => handleClick(button)}
-              className={`w-full h-full ${searchParams.get("page") && parseInt(searchParams.get("page")) === button?"bg-slate-700 text-white": ""}bg-slate-950 text-white rounded-md  active:scale-95`}
+              className={`w-full h-full ${parseInt(searchParams.get("page")?? "1") === button?"bg-slate-700 text-white": ""}bg-slate-950 text-white rounded-md  active:scale-95`}
             >
               {button}
             </button>

@@ -30,7 +30,7 @@ const Pagination = ({...props}: {totalProducts: number, id? :string}) => {
             {buttons.map((button,i)=>{
               return (
                 <li key={i} className="w-16 h-16 mb-4">
-                  <button className={`w-full text-lg h-full  ${button === parseInt(searchParams.get("page"))? "bg-slate-600": "bg-blue-600"} cursor-pointer text-white font-medium rounded-md`} 
+                  <button className={`w-full text-lg h-full  ${button === parseInt(searchParams.get("page")?? "1")? "bg-slate-600": "bg-blue-600"} cursor-pointer text-white font-medium rounded-md`} 
                   onClick={()=> navigate( props.id ? `/dashboard/${props.id}/products/?page=${button}&skip=${button == 1? 0: i * (props.totalProducts + 1)}` :`/products/?page=${button}&skip=${button == 1? 0: i * (props.totalProducts + 1)}`)}>{button}</button>
                 </li>)
          })}

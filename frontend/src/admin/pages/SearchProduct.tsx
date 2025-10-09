@@ -64,7 +64,7 @@ const SearchProduct = () => {
   
   const handleDelete = async(product:string)=>{
       try{    
-        const deleteData = await instance.delete("/admin/deleteProduct",{name:product})
+        const deleteData = await instance.delete("/admin/deleteProduct",{data: {name:product} } )
       }catch(error){
         if (error instanceof AxiosError){
             if (error.status == 401){
