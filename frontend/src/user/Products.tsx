@@ -62,7 +62,6 @@ const Products = () => {
             
           }
         }
-        console.log(error)
         alert(error.message)
         navigate("/")
     } 

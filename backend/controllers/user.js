@@ -153,6 +153,9 @@ const placeOrder = async(req, res)=>{
          if(!findUser){
            return res.status(404).json({message:"User not found login or sign up", success:false})
          }
+
+         //begin transaction for order placement
+
          const session = await mongoose.startSession()
          session.startTransaction()
          for(const item of order){
@@ -173,10 +176,14 @@ const placeOrder = async(req, res)=>{
                 return res.status(400).json({message:`${error.message}`, success:false})
             }
         }
+
         const newOrder = new Order({user:userId, address, OrderList: order, totalPrice})
         await newOrder.save()
         await session.commitTransaction()
         session.endSession()
+
+        // ---End of transaction--
+
         return res.status(200).json({message:"Ordered Successfully", success:true})
     }catch(error){
         console.log(error.message)
