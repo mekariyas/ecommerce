@@ -1,5 +1,6 @@
 import { Outlet } from "react-router-dom"
 import Navbar from "./components/Navbar.tsx"
+import Loading from "./components/Loding.tsx"
 const Home = () => {
   return (
     <>
