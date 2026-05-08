@@ -38,6 +38,7 @@ const Products = () => {
         `/user/products/?page=${searchParams.get("page")}&skip=${searchParams.get("skip") ?? 0}`,
         { withCredentials: true },
       );
+      console.log(dataFetched.data);
       const { products, totalProducts, accessToken } = dataFetched.data;
 
       if (accessToken) {
@@ -83,12 +84,12 @@ const Products = () => {
                 return (
                   <li
                     key={product._id}
-                    className="w-[80%] md:w-[45%] shadow-2xl h-[89vh] flex flex-col  items-start md:space-x-2 rounded-lg mb-2"
+                    className="w-[80%] md:w-[45%] shadow-2xl flex flex-col  items-start md:space-x-2 rounded-lg mb-2 pb-4"
                   >
                     <img
-                      src={`https://res.cloudinary.com/${cloudName}/image/upload/c_scale,w_500/q_auto/f_auto/${product.image}`}
+                      src={`https://res.cloudinary.com/${cloudName}/image/upload/c_scale,w_260,h_220/q_auto/f_auto/${product.image}`}
                       alt={product.name}
-                      className="w-[100%] h-[55%] md:object-cover rounded-tl-md rounded-tr-md"
+                      className="w-full object-cover rounded-tl-md rounded-tr-md"
                       loading="lazy"
                     />
                     <section className="ml-2 mt-6 md:mt-0">
