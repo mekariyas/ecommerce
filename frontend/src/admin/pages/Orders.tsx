@@ -75,8 +75,8 @@ const Orders = () => {
       {allOrders.length === 0 ? (<p className="w-full text-center  md:text-lg font-semibold">No orders found</p>) :(<ul className="w-full pl-4 pt-2 flex justify-start flex-wrap gap-6">
         {allOrders.map((order)=>{
           return<li key={order._id} className="w-[100%] md:w-[35%] h-[52vh] shadow-lg shadow-black rounded-md pt-2 pl-2">
-          <p className="text-base md:text-lg">Name: {order.user.fName} {order.user.lName}</p>
-          <p className="text-base md:text-lg">Email: {order.user.email}</p>
+          <p className="text-base md:text-lg">Name: {order.fName} {order.lName}</p>
+          <p className="text-base md:text-lg">Email: {order.email}</p>
           <p className="text-base md:text-lg">City: {order.address.city}</p>
           <p className="text-base md:text-lg">Sub-city: {order.address.subCity}</p>
           <p className="text-base md:text-lg">Street-Name: {order.address.streetName}</p>
