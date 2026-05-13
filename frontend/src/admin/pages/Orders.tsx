@@ -10,7 +10,7 @@ import instance from "../../api/api"
 
 interface Orders{
   _id: string,
-  user:{
+  user?:{
   email: string,
   fName: string,
   lName: string,
