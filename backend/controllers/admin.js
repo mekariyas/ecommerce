@@ -212,6 +212,7 @@ const getOrders = async(req, res)=>{
         for(const order of orders){
             allOrders = [...allOrders, await order.populate('user', ['fName', 'lName', 'email'])]
         }
+        console.log(allOrders)
         const accessToken = jwt.sign({_id: adminId, role:"admin"},process.env.SECRET_TOKEN,{expiresIn: "15m"})
         return res.status(200).json({orders: allOrders, totalOrders, accessToken})
     }catch(error){
