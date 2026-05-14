@@ -1,93 +1,142 @@
-import {useEffect, useState} from 'react'
-import { useTokenStorage } from '../store/token';
-import {useOrderStore} from "../store/cart.ts"
-import { FaTrash } from 'react-icons/fa6' 
-import {AxiosError} from "axios"
-import instance from "../api/api.tsx"
+import { useEffect, useState } from "react";
+import { useTokenStorage } from "../store/token";
+import { useOrderStore } from "../store/cart.ts";
+import { FaTrash } from "react-icons/fa6";
+import { AxiosError } from "axios";
+import instance from "../api/api.tsx";
 
-import DeliveryForm from "./components/Delivery-form.tsx"
+import DeliveryForm from "./components/Delivery-form.tsx";
 
-interface product{
-  amount: number,
-  brand: string,
-  image: string,
-  name: string,
-  price: number,
-  size: string,
-  color: string
-  _id: string,
+interface product {
+  amount: number;
+  brand: string;
+  image: string;
+  name: string;
+  price: number;
+  size: string;
+  color: string;
+  _id: string;
 }
-
 
 const Cart = () => {
-  const [isAuthorized, setIsAuthorized] = useState<boolean>(false)
-  const setToken = useTokenStorage(state=>state.saveToken)
-  const isAuth = async ()=>{
-      try{
-        const isLoggedIn = await instance.get("/user/refresh", {withCredentials:true})
-        setToken(isLoggedIn.data.accessToken)
-        setIsAuthorized(true)
-      }catch(error){
-        if(error instanceof Error || error instanceof AxiosError){
-          setToken("")
-        }
+  const [isAuthorized, setIsAuthorized] = useState<boolean>(false);
+  const setToken = useTokenStorage((state) => state.saveToken);
+  const isAuth = async () => {
+    try {
+      const isLoggedIn = await instance.get("/user/refresh", {
+        withCredentials: true,
+      });
+      setToken(isLoggedIn.data.accessToken);
+      setIsAuthorized(true);
+    } catch (error) {
+      if (error instanceof Error || error instanceof AxiosError) {
+        setToken("");
       }
     }
+  };
 
-    useEffect(()=>{
-      isAuth()
-    },[])
-  
-  const cloudName = import.meta.env.VITE_CLOUD_NAME
-  const Orders = useOrderStore((state)=>state.orders);
-  const deleteItem = useOrderStore((state)=> state.deleteItem);
-  const clearCart = useOrderStore((state)=> state.clearCart)
-  const [items, setItems] = useState<product[]>([...Orders])
+  useEffect(() => {
+    isAuth();
+  }, []);
 
-  const [isAddressFormVisible, setIsAddressFormVisible] = useState<boolean>(false)
-  const handleClearCart= ()=>{
-    clearCart()
-    setItems([...Orders])
-  }
+  const cloudName = import.meta.env.VITE_CLOUD_NAME;
+  const Orders = useOrderStore((state) => state.orders);
+  const deleteItem = useOrderStore((state) => state.deleteItem);
+  const clearCart = useOrderStore((state) => state.clearCart);
+  const [items, setItems] = useState<product[]>([...Orders]);
 
-  useEffect(()=>{
-    setItems([...Orders])
-  },[Orders])
+  const [isAddressFormVisible, setIsAddressFormVisible] =
+    useState<boolean>(false);
+  const handleClearCart = () => {
+    clearCart();
+    setItems([...Orders]);
+  };
+
+  useEffect(() => {
+    setItems([...Orders]);
+  }, [Orders]);
   return (
     <>
-    {isAuthorized ?(<section className="w-full h-full mt-1 flex flex-col items-center">
-      {items.length === 0? (<p className="text:lg mt-10 text-center w-full font-bold">Cart is empty</p>):(
-        <>
-        {isAddressFormVisible && (<DeliveryForm setIsAddressFormVisible={setIsAddressFormVisible}/>)}
-        <ul className="w-[100%] mt-3 md:w-[70%] flex flex-col">
-         {items.map(item=>{
-          return<li key={item._id} className="flex flex-col items-center md:flex-row md:justify-between pt-4 pl-4 pr-4 h-[70vh]">
-            <section className="w-[80%]  md:w-[50%]">
-              <img src={`https://res.cloudinary.com/${cloudName}/image/upload/c_scale,w_500/q_auto/f_auto/${item.image}`} alt={item.name} className="w-[100%] h-[80%] md:h-[60vh]  md:object-contain rounded-md" loading="lazy"/>
+      {isAuthorized ? (
+        <section className="w-full h-full mt-1 flex flex-col items-center">
+          {items.length === 0 ? (
+            <section className="w-full h-[70vh] flex items-center pt-30">
+              <p className="text:lg mt-10 text-center w-full font-bold">
+                Cart is empty
+              </p>
             </section>
-            <section className="w-[80%] md:w-[45%] h-[62.2%] flex flex-col pl-4 pt-2">
-                <p>Name: {item.name}</p>
-                <p>Price: {item.price} ETB</p>
-                <p>Amount: {item.amount}</p>
-                <p>Color: {item.color}</p>
-                <p>Size: {item.size}</p>
-                <button onClick={()=>{deleteItem(item._id)}} className="w-[90%] h-10 mt-8 rounded-md bg-red-600 flex  items-center justify-center text-white font-bold cursor-pointer"><FaTrash/></button>
-            </section>
-          </li>
-         })}
-        </ul>
-        <p className="w-[70%] md:w-[68%] text-lg font-bold mt-16 md:mt-2">Total: {items.reduce((prev,curr)=>{
-          return prev + curr.price
-        },0)} ETB</p>
-        <button className="mt-3 mb-3 w-[82%] md:w-[38%] h-14 bg-slate-600 rounded-md font-bold text-lg text-white cursor-pointer" onClick={()=>setIsAddressFormVisible(true)}>Check Out</button>
-        <button onClick={handleClearCart} className="mb-2 w-[82%] md:w-[38%] h-14 bg-red-600 rounded-md font-bold text-lg text-white cursor-pointer" >Clear Cart</button>
-        </>)}
-    </section>):(
-      <section className="w-full h-[100vh] flex justify-center mt-18 text-center">
-        <p className="mt-10 text-lg md:text-xl font-semibold">Login/ sign up to view items added to the Cart</p>
-      </section>)}
-  </>
-  )
-}
+          ) : (
+            <>
+              {isAddressFormVisible && (
+                <DeliveryForm
+                  setIsAddressFormVisible={setIsAddressFormVisible}
+                />
+              )}
+              <ul className="w-[100%] mt-3 md:w-[70%] flex flex-col">
+                {items.map((item) => {
+                  return (
+                    <li
+                      key={item._id}
+                      className="flex flex-col items-center md:flex-row md:justify-between pt-4 pl-4 pr-4 h-[70vh]"
+                    >
+                      <section className="w-[80%]  md:w-[50%]">
+                        <img
+                          src={`https://res.cloudinary.com/${cloudName}/image/upload/c_scale,w_500/q_auto/f_auto/${item.image}`}
+                          alt={item.name}
+                          className="w-[100%] h-[80%] md:h-[60vh]  md:object-contain rounded-md"
+                          loading="lazy"
+                        />
+                      </section>
+                      <section className="w-[80%] md:w-[45%] h-[62.2%] flex flex-col pl-4 pt-2">
+                        <p>Name: {item.name}</p>
+                        <p>Price: {item.price} ETB</p>
+                        <p>Amount: {item.amount}</p>
+                        <p>Color: {item.color}</p>
+                        <p>Size: {item.size}</p>
+                        <button
+                          onClick={() => {
+                            deleteItem(item._id);
+                          }}
+                          className="w-[90%] h-10 mt-8 rounded-md bg-red-600 flex  items-center justify-center text-white font-bold cursor-pointer"
+                        >
+                          <FaTrash />
+                        </button>
+                      </section>
+                    </li>
+                  );
+                })}
+              </ul>
+              <p className="w-[70%] md:w-[68%] text-lg font-bold mt-16 md:mt-2">
+                Total:{" "}
+                {items.reduce((prev, curr) => {
+                  return prev + curr.price;
+                }, 0)}{" "}
+                ETB
+              </p>
+              <button
+                className="mt-3 mb-3 w-[82%] md:w-[38%] h-14 bg-slate-600 rounded-md font-bold text-lg text-white cursor-pointer"
+                onClick={() => setIsAddressFormVisible(true)}
+              >
+                Check Out
+              </button>
+              <button
+                onClick={handleClearCart}
+                className="mb-2 w-[82%] md:w-[38%] h-14 bg-red-600 rounded-md font-bold text-lg text-white cursor-pointer"
+              >
+                Clear Cart
+              </button>
+            </>
+          )}
+        </section>
+      ) : (
+        <section className="w-full h-[100vh] flex justify-center mt-18 text-center">
+          <p className="mt-10 text-lg md:text-xl font-semibold">
+            Login/ sign up to view items added to the Cart
+          </p>
+        </section>
+      )}
+    </>
+  );
+};
 
-export default Cart
+export default Cart;
